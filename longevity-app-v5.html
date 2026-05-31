@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Longevity AI">
+<meta name="theme-color" content="#04060a">
+<title>Longevity Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#04060a;--card:#0d1420;--glass:rgba(255,255,255,.025);--border:rgba(255,255,255,.06);
+  --gold:#c9a84c;--gold2:#e8c97a;--gdim:rgba(201,168,76,.12);
+  --cream:#f0e8d8;--muted:#3d5060;--muted2:#5a7080;
+  --teal:#2dd4bf;--rose:#f87171;--lav:#a78bfa;--green:#4ade80;--blue:#38bdf8;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--cream);
+  font-family:'Cormorant Garamond',Georgia,serif}
+body{display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 40% at 50% -5%,rgba(201,168,76,.07) 0%,transparent 60%)}
+::-webkit-scrollbar{display:none}
+input,button,select,textarea{font-family:inherit}
+#hdr{background:rgba(4,6,10,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  padding:13px 20px;padding-top:calc(13px + var(--safe-t));
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:relative;z-index:50}
+.hdr-ey{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.hdr-wm{font-size:20px;font-weight:300;color:var(--cream)}
+.hdr-wm em{font-style:italic;color:var(--gold)}
+.hdr-t{font-family:'DM Mono',monospace;font-size:17px;color:var(--gold);text-align:right}
+.hdr-p{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-align:right}
+#tabs{display:flex;overflow-x:auto;background:rgba(4,6,10,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);flex-shrink:0;scrollbar-width:none;position:relative;z-index:49}
+.tab{flex-shrink:0;padding:11px 12px;background:none;border:none;
+  border-bottom:2px solid transparent;color:var(--muted);font-size:10px;cursor:pointer;
+  font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  position:relative;z-index:1;padding-bottom:calc(20px + var(--safe-b))}
+.page{display:none;padding:16px}
+.page.on{display:block}
+.gc{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.disp{font-size:22px;font-weight:300;color:var(--cream);line-height:1.2;margin-bottom:6px}
+.disp em{font-style:italic;color:var(--gold)}
+.sub{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:16px}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.scard{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.snum{font-size:26px;font-weight:300;letter-spacing:-1px}
+.slbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);margin-top:4px}
+.supp{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px}
+#ask-inner{display:flex;flex-direction:column;height:calc(100vh - 132px)}
+.mode-bar{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.mbtn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;transition:all .2s}
+.mbtn.on{background:var(--gdim);border-color:rgba(201,168,76,.3);color:var(--gold)}
+#msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:88%;padding:13px 16px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.msg.u{align-self:flex-end;background:var(--gdim);border:1px solid rgba(201,168,76,.2);color:var(--cream)}
+.msg.a{align-self:flex-start;background:var(--glass);border:1px solid var(--border);color:var(--cream)}
+.msg.e{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.2)}
+.mlbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:7px;text-transform:uppercase}
+.sug{background:var(--glass);border:1px solid var(--border);border-radius:10px;
+  padding:11px 14px;color:var(--muted2);font-size:13px;text-align:left;cursor:pointer;
+  font-family:inherit;width:100%;margin-bottom:8px;display:block}
+.irow{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);
+  background:rgba(4,6,10,.95);backdrop-filter:blur(20px);padding-bottom:calc(12px + var(--safe-b))}
+.qin{flex:1;background:var(--glass);border:1px solid var(--border);border-radius:12px;
+  padding:12px 16px;color:var(--cream);font-size:13px;font-family:inherit;outline:none}
+.qin:focus{border-color:rgba(201,168,76,.3)}
+.qin::placeholder{color:var(--muted)}
+.sbtn{background:var(--gold);color:#04060a;border:none;border-radius:12px;padding:12px 20px;
+  font-family:'DM Mono',monospace;font-size:14px;font-weight:500;cursor:pointer}
+.sbtn:disabled{background:var(--glass);color:var(--muted);border:1px solid var(--border)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+.tcard{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
+.tstep{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all .2s;margin-bottom:6px}
+.tstep.done .step-txt{text-decoration:line-through;color:var(--muted)}
+.chk{width:20px;height:20px;border-radius:50%;flex-shrink:0;border:1px solid var(--muted);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;transition:all .2s;margin-top:1px}
+.step-txt{font-size:13px;color:var(--cream);line-height:1.5}
+.pbar{height:1px;background:var(--border);border-radius:1px;margin:10px 0}
+.pfill{height:1px;border-radius:1px;transition:width .4s}
+.ccard{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;cursor:pointer}
+.frow{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:4px}
+.fbtn{flex-shrink:0;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-family:'DM Mono',monospace;font-size:9px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.fbtn.on{background:var(--gdim);border-color:rgba(201,168,76,.3);color:var(--gold)}
+.abtn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#04060a;border:none;
+  border-radius:12px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:600;margin-bottom:14px}
+.abtn:disabled{background:var(--glass);color:var(--muted);border:1px solid var(--border)}
+.bwin{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--cream);font-family:'DM Mono',monospace;font-size:12px;outline:none;width:100%}
+.bwin:focus{border-color:rgba(201,168,76,.3)}
+.bwin::placeholder{color:var(--muted)}
+.bmcard{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s;margin-bottom:10px;position:relative;overflow:hidden}
+.sopt{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);border:1px solid var(--border);width:100%;margin-bottom:8px;text-align:left}
+.radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.rdot{width:7px;height:7px;border-radius:50%;background:var(--panel)}
+.tlbar{position:relative;height:26px;background:rgba(0,0,0,.3);border-radius:8px;overflow:hidden;margin-bottom:10px}
+@keyframes pulse{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bPulse{from{transform:scale(1);opacity:.7}to{transform:scale(2.4);opacity:.1}}
+.fu{animation:fadeUp .3s ease forwards}
+input[type=range]{-webkit-appearance:none;height:3px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--lav);cursor:pointer}
+input[type=time]{-webkit-appearance:none;color-scheme:dark}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <div><div class="hdr-ey">Longevity Panel</div><div class="hdr-wm">Health <em>Intelligence</em></div></div>
+  <div><div class="hdr-t" id="clk">--:--</div><div class="hdr-p" id="period">MORNING</div></div>
+</div>
+<div id="tabs">
+  <button class="tab on" data-page="home">Home</button>
+  <button class="tab" data-page="ask">Ask AI</button>
+  <button class="tab" data-page="mplan">Meal Plan</button>
+  <button class="tab" data-page="mai">Meal AI</button>
+  <button class="tab" data-page="breath">Breathe</button>
+  <button class="tab" data-page="tracks">Tracks</button>
+  <button class="tab" data-page="conflicts">Conflicts</button>
+  <button class="tab" data-page="supps">Supplements</button>
+  <button class="tab" data-page="specs">Specialists</button>
+  <button class="tab" data-page="profile">Profile</button>
+  <button class="tab" data-page="about">About</button>
+</div>
+<div id="content">
+
+<div id="home" class="page on">
+  <div id="home-ins"></div>
+  <div id="home-meals"></div>
+  <div class="sgrid">
+    <div class="scard"><div class="snum" style="color:var(--gold)">62</div><div class="slbl">Specialists</div></div>
+    <div class="scard"><div class="snum" id="win-stat" style="color:var(--teal)">--h</div><div class="slbl">Eating Window</div></div>
+    <div class="scard"><div class="snum" style="color:var(--lav)">5</div><div class="slbl">Tracks</div></div>
+    <div class="scard"><div class="snum" style="color:var(--green)">26</div><div class="slbl">Disciplines</div></div>
+  </div>
+  <div id="setup-note" style="display:none">
+    <div class="gc" style="border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.06);cursor:pointer" id="setup-tap">
+      <div class="eyebrow">Setup Recommended</div>
+      <div style="font-size:14px;color:var(--cream);margin-bottom:4px">Set your wake time, work schedule and eating pattern</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold)">Tap to configure &rarr;</div>
+    </div>
+  </div>
+</div>
+
+<div id="ask" class="page">
+  <div id="ask-inner">
+    <div class="mode-bar">
+      <button class="mbtn on" id="mbtn-ask">Ask Specialists</button>
+      <button class="mbtn" id="mbtn-conf">Find Conflicts</button>
+    </div>
+    <div id="msgs">
+      <div id="sugs" style="padding:8px 0">
+        <div style="text-align:center;padding:20px 0 14px">
+          <div style="font-size:28px;margin-bottom:8px;opacity:.5">[+]</div>
+          <div style="font-size:20px;font-weight:300;color:var(--cream);margin-bottom:4px">Your Specialist Panel</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px">62 world-leading health experts</div>
+        </div>
+        <button class="sug" id="s1">What do all specialists agree on for longevity?</button>
+        <button class="sug" id="s2">What is the best morning routine based on the research?</button>
+        <button class="sug" id="s3">How do I optimise my gut health?</button>
+        <button class="sug" id="s4">What supplements should I take and when?</button>
+      </div>
+    </div>
+    <div class="irow">
+      <input class="qin" id="qin" placeholder="Ask your panel anything...">
+      <button class="sbtn" id="sbtn">&#8593;</button>
+    </div>
+  </div>
+</div>
+
+<div id="mplan" class="page"><div id="mplan-c"></div></div>
+
+<div id="mai" class="page">
+  <div class="gc" style="border-color:rgba(201,168,76,.2)">
+    <div class="eyebrow">My Bloodwork Profile</div>
+    <div class="disp" style="font-size:18px">Personal Health Data</div>
+    <div style="font-size:13px;color:var(--muted2);margin-bottom:14px">Add your markers for personalised meal analysis</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">Blood Glucose</div><input class="bwin" id="bw-glucose" placeholder="e.g. 92"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">HbA1c (%)</div><input class="bwin" id="bw-hba1c" placeholder="e.g. 5.4"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">Cholesterol</div><input class="bwin" id="bw-chol" placeholder="e.g. 185"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">LDL</div><input class="bwin" id="bw-ldl" placeholder="e.g. 110"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">HDL</div><input class="bwin" id="bw-hdl" placeholder="e.g. 55"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">Triglycerides</div><input class="bwin" id="bw-trig" placeholder="e.g. 120"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">CRP (mg/L)</div><input class="bwin" id="bw-crp" placeholder="e.g. 1.2"></div>
+      <div><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:5px;text-transform:uppercase">Vitamin D</div><input class="bwin" id="bw-vitd" placeholder="e.g. 42"></div>
+    </div>
+    <button id="bw-save" style="width:100%;margin-top:12px;padding:10px;background:var(--gdim);border:1px solid rgba(201,168,76,.25);border-radius:10px;color:var(--gold);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">Save Bloodwork</button>
+    <div id="bw-ok" style="display:none;text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:2px;margin-top:8px">SAVED</div>
+  </div>
+  <div class="eyebrow">Meal Analysis</div>
+  <div class="disp">Snap Your Meal</div>
+  <div class="sub">Photograph your food for an AI nutritional breakdown personalised to your bloodwork</div>
+  <input type="file" id="file-in" accept="image/*" capture="environment" style="display:none">
+  <div id="drop-zone" style="border:1px dashed rgba(201,168,76,.3);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;background:var(--glass);margin-bottom:14px">
+    <div style="font-size:32px;margin-bottom:10px;opacity:.5">[Camera]</div>
+    <div style="font-size:18px;font-weight:300;color:var(--cream);margin-bottom:6px">Tap to photograph your meal</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px">or select from your photos</div>
+  </div>
+  <div id="meal-prev" style="display:none;margin-bottom:14px"><img id="meal-img" src="" alt="Meal" style="width:100%;border-radius:14px;border:1px solid var(--border);max-height:250px;object-fit:cover"></div>
+  <button class="abtn" id="anal-btn" disabled>Analyse This Meal</button>
+  <div id="meal-res"></div>
+</div>
+
+<div id="breath" class="page">
+  <div id="blist">
+    <div class="eyebrow">Breathing Companion</div>
+    <div class="disp">Select a <em>Method</em></div>
+    <div class="sub">Rings breathe with you. The box traces your path. The dial counts every beat.</div>
+  </div>
+  <div id="bsession" style="display:none"></div>
+</div>
+
+<div id="tracks" class="page">
+  <div class="eyebrow">Mastery Programmes</div>
+  <div class="disp">Learning <em>Tracks</em></div>
+  <div class="sub">Structured curricula from your specialist panel</div>
+  <div id="tracks-c"></div>
+</div>
+
+<div id="conflicts" class="page">
+  <div class="eyebrow">Where Experts Disagree</div>
+  <div class="disp">Specialist <em>Conflicts</em></div>
+  <div class="sub">The most important debates in health science, clearly mapped</div>
+  <div id="conf-c"></div>
+</div>
+
+<div id="supps" class="page">
+  <div class="eyebrow">Daily Protocol</div>
+  <div class="disp">Supplement <em>Guide</em></div>
+  <div class="sub">Evidence-based recommendations by time of day</div>
+  <div id="supps-c"></div>
+</div>
+
+<div id="specs" class="page">
+  <div class="eyebrow">Your Panel</div>
+  <div class="disp">62 World <em>Experts</em></div>
+  <div class="sub">Across 26 health disciplines</div>
+  <div class="frow" id="spec-filters"></div>
+  <div id="specs-c"></div>
+</div>
+
+<div id="profile" class="page">
+  <div class="eyebrow">Setup</div>
+  <div class="disp">Your Circadian <em>Profile</em></div>
+  <div class="sub">Tell the app when you live. It calculates your optimal meal windows, supplement timing, and daily protocols.</div>
+  <div class="gc" style="border-color:rgba(201,168,76,.2)">
+    <div class="eyebrow">Sleep Schedule</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase">Wake Time</div>
+        <input type="time" id="p-wake" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--cream);font-family:'DM Mono',monospace;font-size:14px;outline:none">
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase">Sleep Time</div>
+        <input type="time" id="p-sleep" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--cream);font-family:'DM Mono',monospace;font-size:14px;outline:none">
+      </div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.6">Once connected to Apple Health, these will be auto-detected from your wearable.</div>
+  </div>
+  <div class="gc" style="border-color:rgba(45,212,191,.2)">
+    <div class="eyebrow" style="color:var(--teal)">Work Schedule</div>
+    <div id="shift-opts"></div>
+  </div>
+  <div class="gc" style="border-color:rgba(167,139,250,.2)">
+    <div class="eyebrow" style="color:var(--lav)">Eating Pattern</div>
+    <div id="eat-opts"></div>
+    <div id="custom-wrap" style="display:none;padding:12px 14px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid var(--border);margin-top:8px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);margin-bottom:10px">Hours of Fasting Per Day</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <input type="range" min="12" max="23" value="16" id="fast-slide">
+        <div id="fast-val" style="font-family:'DM Mono',monospace;font-size:18px;color:var(--lav);min-width:36px">16h</div>
+      </div>
+      <div id="eat-sub" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px">8hr eating / 16hr fast</div>
+    </div>
+  </div>
+  <button id="save-prof" style="width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:12px;color:#04060a;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;cursor:pointer">Save My Profile</button>
+</div>
+
+<div id="about" class="page">
+  <div class="eyebrow">About</div>
+  <div class="disp">The <em>Author</em></div>
+  <div class="sub">The vision behind the Longevity Panel</div>
+  <div class="gc" style="border-color:rgba(201,168,76,.2);text-align:center;padding:28px 20px">
+    <div style="width:100px;height:100px;border-radius:50%;background:var(--gdim);border:2px solid rgba(201,168,76,.3);margin:0 auto 16px;display:flex;align-items:center;justify-content:center">
+      <div style="font-size:32px;opacity:.6">[Photo]</div>
+    </div>
+    <div style="font-size:24px;font-weight:300;color:var(--cream);margin-bottom:4px">Your Name</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px">Health &amp; Longevity Curator</div>
+    <div style="font-size:13px;color:var(--muted2);line-height:1.8;text-align:left">Add your personal bio here. Describe your health journey, what led you to create this panel, and your mission for sharing this knowledge.</div>
+  </div>
+  <div class="gc">
+    <div class="eyebrow">The Mission</div>
+    <div style="font-size:14px;color:var(--cream);line-height:1.9">The Longevity Panel brings together 62 of the world's foremost health and longevity specialists across 26 disciplines &mdash; from anti-aging biology to breathwork, heart disease to oral microbiome science, trauma to intermittent fasting.</div>
+    <div style="font-size:14px;color:var(--cream);line-height:1.9;margin-top:12px">The goal is to make evidence-based health knowledge accessible, personalised, and actionable &mdash; giving everyone access to the same level of expert guidance previously available only to those who could afford a team of personal physicians.</div>
+  </div>
+  <div class="gc">
+    <div class="eyebrow">The Panel</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--gold);font-weight:300">62</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px">World Experts</div></div>
+      <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--teal);font-weight:300">26</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px">Disciplines</div></div>
+      <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--lav);font-weight:300">100+</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px">Books Referenced</div></div>
+      <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--green);font-weight:300">1000+</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px">Hours of Content</div></div>
+    </div>
+  </div>
+  <div class="gc">
+    <div class="eyebrow">Disclaimer</div>
+    <div style="font-size:12px;color:var(--muted2);line-height:1.8">This app is for educational and informational purposes only. Nothing in this app constitutes medical advice. Always consult a qualified healthcare professional before making changes to your diet, exercise, supplementation, or health protocols.</div>
+  </div>
+  <div class="gc">
+    <div class="eyebrow">Connect</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);width:70px">Website</div><div style="font-size:13px;color:var(--muted2)">yourwebsite.com</div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);width:70px">Instagram</div><div style="font-size:13px;color:var(--muted2)">@yourhandle</div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border)"><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);width:70px">Email</div><div style="font-size:13px;color:var(--muted2)">your@email.com</div></div>
+    </div>
+  </div>
+  <div style="text-align:center;padding:20px 0;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px">LONGEVITY PANEL &copy; 2025 &middot; ALL RIGHTS RESERVED</div>
+</div>
+
+</div>
+<script>
+'use strict';
+var SPECS=[{n:"Dr. Peter Attia",c:"Longevity",t:"Zone 2, VO2max, muscle, metabolic health, lifespan medicine"},{n:"Dr. Andrew Huberman",c:"Neuroscience",t:"Sleep protocols, dopamine, breathwork, morning light, stress"},{n:"Dr. Matthew Walker",c:"Sleep",t:"Sleep science, memory consolidation, circadian biology"},{n:"Dr. Mark Hyman",c:"Nutrition",t:"Functional medicine, food as medicine, gut health, inflammation"},{n:"Dr. Rhonda Patrick",c:"Nutrition",t:"Micronutrients, heat stress, protein priority, resistance training"},{n:"Dr. Valter Longo",c:"Fasting",t:"Fasting mimicking diet, caloric restriction, longevity"},{n:"Dr. Satchin Panda",c:"Fasting",t:"Circadian biology, 10-hour eating window, time-restricted eating"},{n:"Dr. Jason Fung",c:"Fasting",t:"Therapeutic fasting, diabetes reversal, insulin resistance"},{n:"Dr. Mindy Pelz",c:"Women's Health",t:"Cycle-syncing fasting, hormonal health, menopause"},{n:"Dr. Mark Mattson",c:"Fasting",t:"BDNF, neurogenesis, fasting neuroprotection, Alzheimer's"},{n:"Dr. William Li",c:"Nutrition",t:"Angiogenesis, brown vs white fat, metabolic flexibility"},{n:"Dr. Darshan Shah",c:"Longevity",t:"CGM, glucose curve management, biomarker tracking"},{n:"Dr. Rangan Chatterjee",c:"Lifestyle",t:"4-pillar health: food, movement, sleep, relaxation"},{n:"Dr. David Sinclair",c:"Longevity",t:"Epigenetics, NAD+, NMN, sirtuins, aging biology"},{n:"Dr. Dale Bredesen",c:"Brain Health",t:"ReCODE protocol, Alzheimer's reversal, cognitive decline"},{n:"Dr. Lisa Mosconi",c:"Brain Health",t:"Brain nutrition, women's brain health, Alzheimer's prevention"},{n:"Dr. Tim Spector",c:"Gut Health",t:"Microbiome, fermented foods, personalized nutrition"},{n:"Dr. Emeran Mayer",c:"Gut Health",t:"Gut-brain axis, microbiome, stress-gut connection"},{n:"Dr. Gabor Mate",c:"Trauma",t:"Trauma-disease connection, suppressed emotion, compassionate inquiry"},{n:"Dr. Bessel van der Kolk",c:"Trauma",t:"PTSD, somatic trauma, EMDR, neurofeedback"},{n:"Wim Hof",c:"Breathwork",t:"Breathwork, cold exposure, immune resilience"},{n:"Dr. James Nestor",c:"Breathwork",t:"Nasal breathing, CO2 tolerance, Buteyko method"},{n:"Lawrence Van Lingen",c:"Movement",t:"Backward walking, flow rope, breathing normalization"},{n:"Dr. Joel Kahn",c:"Heart Health",t:"Plant-based cardiology, holistic heart disease reversal"},{n:"Dr. Caldwell Esselstyn",c:"Heart Health",t:"Plant-based cardiology, heart disease reversal"},{n:"Dr. Dean Ornish",c:"Heart Health",t:"Lifestyle cardiology, nutrition, stress, community"},{n:"Dr. Gabrielle Lyon",c:"Strength",t:"Muscle-centric medicine, protein, strength training"},{n:"Dr. Andy Galpin",c:"Strength",t:"Muscle adaptation, VO2max, hydration, performance"},{n:"Dr. Stuart Phillips",c:"Strength",t:"Muscle protein synthesis, aging, protein requirements"},{n:"Dr. Sara Gottfried",c:"Women's Health",t:"Hormonal health, autoimmunity, cardiometabolic disease"},{n:"Dr. Mary Claire Haver",c:"Women's Health",t:"Menopause, Galveston diet, anti-inflammatory nutrition"},{n:"Dan Buettner",c:"Lifestyle",t:"Blue Zones, centenarian lifestyle, community, ikigai"},{n:"Dr. Robert Waldinger",c:"Lifestyle",t:"Relationships and longevity, Harvard study, happiness"},{n:"Ken Mogi",c:"Purpose",t:"Ikigai, purposeful living, Okinawan longevity, neuroscience"},{n:"Dr. Michael Hamblin",c:"Biohacking",t:"Red/NIR light therapy, photobiomodulation"},{n:"Clinton Ober",c:"Grounding",t:"Earthing, free electrons, inflammation reduction, sleep"},{n:"Dr. Shanna Swan",c:"Environment",t:"Microplastics, phthalates, BPA, endocrine disruption"},{n:"Dr. Leonardo Trasande",c:"Environment",t:"Plastic chemicals, PFAS, environmental health policy"},{n:"Thomas W. Myers",c:"Fascia",t:"Anatomy Trains, myofascial meridians, structural integration"},{n:"Dr. Robert Schleip",c:"Fascia",t:"Fascia biology, contractility, innervation, pain science"},{n:"Dr. Jon Kabat-Zinn",c:"Stress",t:"MBSR, mindfulness-based stress reduction, chronic pain"},{n:"Dr. Joe Dispenza",c:"Stress",t:"Meditation, epigenetics, neuroplasticity, heart coherence"},{n:"Dr. Robert Sapolsky",c:"Stress",t:"Cortisol, chronic stress biology, neuroendocrinology"},{n:"Dr. Dana Cohen",c:"Lifestyle",t:"Gel water, hydration science, cellular health"},{n:"Dr. Benjamin Bikman",c:"Fasting",t:"Insulin resistance, metabolic disease, ketones"},{n:"Dr. Robynne Chutkan",c:"Gut Health",t:"Microbiome, digestive health, Live Dirty Eat Clean"},{n:"Dr. Mark Burhenne",c:"Oral Health",t:"Oral microbiome, mouth breathing, sleep apnea"},{n:"Dr. Steven Lin",c:"Oral Health",t:"Oral microbiome, dental diet, gut-oral axis"},{n:"Dr. Elissa Epel",c:"Stress",t:"Telomeres, cellular aging, stress, meditation"},{n:"Dr. Alessio Fasano",c:"Gut Health",t:"Leaky gut, zonulin, intestinal permeability, autoimmune"},{n:"Dr. George Church",c:"Longevity",t:"CRISPR, gene therapy, epigenetic reprogramming"},{n:"Dr. Steve Horvath",c:"Longevity",t:"Epigenetic clock, biological age, DNA methylation"},{n:"Dr. Deepak Chopra",c:"Integrative",t:"Ayurveda, mind-body medicine, meditation, consciousness"},{n:"Dr. Andrew Weil",c:"Integrative",t:"Integrative medicine, anti-inflammatory diet, adaptogens"}];
+var SUPPS=[{time:"Morning",n:"Vitamin D3 + K2",dose:"5000 IU / 100mcg",why:"Immune function, bone health, hormones. Take with first meal.",expert:"Dr. Rhonda Patrick",col:"var(--gold)"},{time:"Morning",n:"Omega-3 Fish Oil",dose:"2-4g EPA+DHA",why:"Inflammation reduction, brain health, cardiovascular protection.",expert:"Dr. Peter Attia",col:"var(--gold)"},{time:"Morning",n:"Magnesium Glycinate",dose:"200-400mg",why:"300+ enzymatic reactions. Most people are deficient.",expert:"Dr. Mark Hyman",col:"var(--gold)"},{time:"Morning",n:"NMN or NR",dose:"500mg-1g",why:"NAD+ precursor. Mitochondrial function and cellular energy.",expert:"Dr. David Sinclair",col:"var(--gold)"},{time:"Lunch",n:"Coenzyme Q10",dose:"100-200mg",why:"Mitochondrial energy. Best absorbed with fat at lunch.",expert:"Dr. Joel Kahn",col:"var(--green)"},{time:"Lunch",n:"Alpha Lipoic Acid",dose:"300-600mg",why:"Antioxidant. Recycles vitamins C and E. Reduces inflammation.",expert:"Dr. Bruce Ames",col:"var(--green)"},{time:"Evening",n:"Magnesium L-Threonate",dose:"1500-2000mg",why:"Crosses blood-brain barrier. Enhances sleep and memory.",expert:"Dr. Andrew Huberman",col:"var(--lav)"},{time:"Evening",n:"Apigenin",dose:"50mg",why:"Reduces cortisol wakefulness. Promotes deep sleep onset.",expert:"Dr. Andrew Huberman",col:"var(--lav)"},{time:"Evening",n:"Glycine",dose:"2-3g",why:"Improves sleep quality, collagen synthesis, lowers core temp.",expert:"Dr. Rhonda Patrick",col:"var(--lav)"}];
+var INSIGHTS=[{from:5,to:9,label:"Early Morning",col:"var(--gold)",rituals:["Drink 500ml water immediately on waking","Get sunlight within 30 minutes for circadian anchoring","5 minutes of gratitude journaling before checking your phone","Delay caffeine 90-120 minutes after waking"],experts:["Dr. Andrew Huberman","Dr. Satchin Panda","Dr. Rhonda Patrick"]},{from:9,to:12,label:"Morning",col:"var(--teal)",rituals:["Take morning supplements with first meal","Peak cognitive window - protect it for deep work","Exercise now leverages peak cortisol","Nasal breathing during all movement"],experts:["Dr. Peter Attia","Dr. Andy Galpin","Dr. Satchin Panda"]},{from:12,to:14,label:"Midday",col:"var(--green)",rituals:["Take lunch supplements (CoQ10, ALA)","Eat your largest meal - insulin sensitivity peaks now","10-20 min walk after eating reduces glucose spike","NSDR or Yoga Nidra 10-20 min recharges the brain"],experts:["Dr. Satchin Panda","Dr. Andrew Huberman","Dr. Rhonda Patrick"]},{from:14,to:17,label:"Afternoon",col:"var(--lav)",rituals:["Last caffeine by 2pm - half-life is 5-6 hours","Peak physical coordination - ideal for sport","End eating window if on TRE","Hydration check - urine should be pale yellow"],experts:["Dr. Matthew Walker","Dr. Satchin Panda","Dr. Andy Galpin"]},{from:17,to:20,label:"Evening",col:"var(--rose)",rituals:["Begin dimming lights - use warm amber bulbs","Avoid bright and blue lighting after sunset","Take evening supplements with last meal","Avoid vigorous exercise within 3 hours of bed"],experts:["Dr. Matthew Walker","Dr. Andrew Huberman","Dr. Andrew Weil"]},{from:20,to:24,label:"Night",col:"var(--lav)",rituals:["Room temperature 65-68F for optimal sleep onset","Complete darkness - blackout curtains or eye mask","No screens 30-60 min before bed","Try 4-7-8 or Box Breathing to decelerate"],experts:["Dr. Matthew Walker","Dr. Michael Breus","Dr. Andrew Huberman"]},{from:0,to:5,label:"Late Night",col:"var(--muted2)",rituals:["You should be asleep. 7-9 hours is non-negotiable.","Brain clears amyloid beta waste only during deep sleep","If awake: physiological sigh x3 resets nervous system","Consistent sleep time is the single most important circadian anchor"],experts:["Dr. Matthew Walker","Dr. Rhonda Patrick"]}];
+var CONFLICTS=[{topic:"Intermittent Fasting",a:"Dr. Valter Longo",b:"Dr. Peter Attia",av:"Long fasting windows trigger deep cellular regeneration and autophagy - essential for longevity and cancer prevention.",bv:"Aggressive fasting accelerates muscle loss. Now recommends moderate time-restriction only with adequate protein, especially in older adults."},{topic:"Protein Intake",a:"Dr. Rhonda Patrick",b:"Dr. Valter Longo",av:"Prioritise protein intake and resistance training above fasting window length. High protein preserves muscle and supports longevity.",bv:"Excess protein activates mTOR and IGF-1, accelerating aging. Moderate plant-based protein is optimal for long-term health."},{topic:"Saturated Fat",a:"Dr. Mark Hyman",b:"Dr. Dean Ornish",av:"Healthy fats from quality sources are not the enemy - sugar and ultra-processed food are.",bv:"All saturated fat raises cardiovascular risk. Only a very low-fat whole-food plant-based diet reverses heart disease."},{topic:"Red Meat",a:"Dr. Peter Attia",b:"Dr. Joel Kahn",av:"High-quality animal protein is essential for muscle preservation, strength, and metabolic health as we age.",bv:"Plant-based nutrition is the most powerful preventive medicine. Red meat consistently correlates with cardiovascular mortality."},{topic:"Fasting for Women",a:"Dr. Mindy Pelz",b:"Dr. Andrew Huberman",av:"Women must cycle-sync their fasting - fasting aggressively in the luteal phase disrupts cortisol and progesterone.",bv:"Time-restricted eating benefits are largely consistent across sexes when caloric needs are met."}];
+var TRACKS=[{title:"Sleep Mastery",weeks:6,col:"var(--lav)",specs:["Dr. Matthew Walker","Dr. Michael Breus","Dr. Andrew Huberman"],steps:["Week 1: Discover your chronotype. Set consistent sleep and wake times.","Week 2: Optimise environment - 65-68F, blackout, silence.","Week 3: Build a 30-minute wind-down ritual every evening.","Week 4: Master circadian light exposure morning and evening.","Week 5: Track sleep with wearable - learn to interpret your data.","Week 6: Advanced - NSDR, sleep supplements, troubleshooting."]},{title:"Gut Health Reset",weeks:8,col:"var(--green)",specs:["Dr. Tim Spector","Dr. Emeran Mayer","Dr. Robynne Chutkan"],steps:["Week 1: Gut baseline - food diary and symptom log.","Week 2: Introduce 30 different plant foods per week.","Week 3: Add fermented foods daily - kefir, kimchi, sauerkraut.","Week 4: Eliminate ultra-processed food and refined seed oils.","Week 5: Prebiotic fibre - garlic, onion, leeks, oats, chicory.","Week 6: Gut-brain connection - stress reduction protocols.","Week 7: Oral microbiome - nasal breathing, tongue posture.","Week 8: Full integration - assess and build ongoing protocol."]},{title:"Stress Resilience",weeks:5,col:"var(--teal)",specs:["Dr. Andrew Huberman","Wim Hof","Dr. Jon Kabat-Zinn"],steps:["Week 1: Learn physiological sigh - use it 3x daily.","Week 2: Begin daily 10-minute MBSR meditation practice.","Week 3: Add cold exposure - 30-60 seconds after warm shower.","Week 4: Box breathing before any stressful event.","Week 5: Full Wim Hof breathing session 3x per week."]},{title:"Strength and Muscle",weeks:12,col:"var(--gold)",specs:["Dr. Gabrielle Lyon","Dr. Andy Galpin","Dr. Stuart Phillips"],steps:["Week 1-2: Baseline - grip strength, VO2max, body composition.","Week 3-4: Protein intake - 1g per lb bodyweight minimum daily.","Week 5-6: Compound movement - squat, hinge, push, pull, carry.","Week 7-8: Progressive overload - add 2.5-5% load each week.","Week 9-10: Zone 2 cardio - 150 minutes per week minimum.","Week 11-12: VO2max intervals - 4x4 min high intensity, 3x/week."]},{title:"Trauma and Emotions",weeks:8,col:"var(--rose)",specs:["Dr. Gabor Mate","Dr. Bessel van der Kolk","Dr. Joe Dispenza"],steps:["Week 1: Core concepts from When the Body Says No.","Week 2: Body scan meditation - 15 minutes daily.","Week 3: Compassionate Inquiry journaling - 3 questions daily.","Week 4: Identify 3 somatic signals of stress in your body.","Week 5: EMDR-informed bilateral eye movement practice.","Week 6: Dr. Dispenza heart coherence meditation - 20 minutes.","Week 7: Community and safe relationship building.","Week 8: Integration - full mind-body protocol and review."]}];
+var BMETHS=[{id:"sigh",name:"Physiological Sigh",expert:"Dr. Andrew Huberman",tag:"Fastest proven stress reset",inhale:2,hold1:1,exhale:6,hold2:0,cycles:5,vis:"rings",ac:"#38bdf8",gl:"#7dd3fc",ti:528,th:396,te:285},{id:"box",name:"Box Breathing",expert:"Dr. Andrew Huberman",tag:"Navy SEAL nervous system reset",inhale:4,hold1:4,exhale:4,hold2:4,cycles:4,vis:"box",ac:"#c9a84c",gl:"#e8c97a",ti:432,th:396,te:360},{id:"478",name:"4-7-8 Breathing",expert:"Dr. Andrew Weil",tag:"Natural tranquiliser for the nervous system",inhale:4,hold1:7,exhale:8,hold2:0,cycles:4,vis:"dial",ac:"#a78bfa",gl:"#c4b5fd",ti:417,th:396,te:285},{id:"wim",name:"Wim Hof (Light)",expert:"Wim Hof",tag:"Charge the body and boost immunity",inhale:2,hold1:0,exhale:2,hold2:0,cycles:8,vis:"rings",ac:"#f87171",gl:"#fca5a5",ti:528,th:528,te:396},{id:"buteyko",name:"Buteyko Nasal",expert:"Dr. James Nestor",tag:"Restore CO2 balance and oxygen delivery",inhale:3,hold1:0,exhale:3,hold2:2,cycles:6,vis:"rings",ac:"#4ade80",gl:"#86efac",ti:432,th:396,te:285}];
+var SHIFTS=[{id:"standard",l:"Standard Day",s:"9am-5pm or similar"},{id:"12day",l:"12-Hour Day Shift",s:"7am-7pm"},{id:"night",l:"Night Shift",s:"7pm-7am or similar"},{id:"rotating",l:"Rotating Shifts",s:"Changes week to week"},{id:"flexible",l:"Flexible / WFH",s:"No fixed schedule"}];
+var EATS=[{id:"3meal",l:"Breakfast / Lunch / Dinner",s:"Traditional 3-meal pattern"},{id:"1212",l:"12:12 Gentle Fast",s:"12hr eating - 12hr fast"},{id:"1410",l:"14:10 Moderate TRE",s:"10hr eating - 14hr fast"},{id:"168",l:"16:8 Strict TRE",s:"8hr eating - 16hr fast"},{id:"custom",l:"Custom Fast",s:"Set your own fasting hours"}];
+var PILLCOLS=["var(--gold)","var(--teal)","var(--green)","var(--rose)","var(--lav)"];
+
+</script>
+<script>
+'use strict';
+
+// &#9472;&#9472; STATE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+var chatMode = 'ask';
+var mealImg = null;
+var bwData = {};
+var trackDone = {};
+var elApiKey = '';
+var voiceOn = true, toneOn = true, ambOn = true, audioOnly = false;
+var breathMethod = null, breathPhase = '', breathCycle = 0, breathProg = 0, breathDone = false;
+var breathRAF = null;
+var audioCtx = null, ambOscs = null, ambGain = null, mp3Player = null;
+var mp3Cache = {}, mp3Ready = false;
+var speechVoices = [], speechIdx = 0;
+var profile = {wakeTime:'06:30',sleepTime:'22:30',shiftType:'standard',eatPattern:'1410',fastingHours:14};
+var profileSaved = false;
+
+// &#9472;&#9472; BOOT &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+document.addEventListener('DOMContentLoaded', function() {
+  setupTabs();
+  setupAsk();
+  updateClock();
+  setInterval(updateClock, 30000);
+  loadProfile();
+  loadBW();
+  renderHome();
+  renderBreathList();
+  renderTracks();
+  renderConflicts();
+  renderSupps();
+  renderSpecs();
+  renderProfile();
+  preloadMp3s();
+  loadVoices();
+  if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = loadVoices;
+
+  var setupTap = document.getElementById('setup-tap');
+  if (setupTap) setupTap.addEventListener('click', function() { goPage('profile'); });
+
+  var saveProf = document.getElementById('save-prof');
+  if (saveProf) saveProf.addEventListener('click', saveProfile);
+
+  var bwSave = document.getElementById('bw-save');
+  if (bwSave) bwSave.addEventListener('click', saveBW);
+
+  var fastSlide = document.getElementById('fast-slide');
+  if (fastSlide) {
+    fastSlide.addEventListener('input', function() {
+      var v = parseInt(this.value);
+      var fv = document.getElementById('fast-val');
+      var es = document.getElementById('eat-sub');
+      if (fv) fv.textContent = v + 'h';
+      if (es) es.textContent = (24 - v) + 'hr eating / ' + v + 'hr fast';
+    });
+  }
+
+  var analBtn = document.getElementById('anal-btn');
+  if (analBtn) analBtn.addEventListener('click', analyzeMeal);
+
+  var dropZone = document.getElementById('drop-zone');
+  if (dropZone) dropZone.addEventListener('click', function() {
+    var fi = document.getElementById('file-in');
+    if (fi) fi.click();
+  });
+
+  var fileIn = document.getElementById('file-in');
+  if (fileIn) fileIn.addEventListener('change', function() { handleFile(this); });
+});
+
+// &#9472;&#9472; STORAGE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function storeSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+function storeGet(k, def) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+
+// &#9472;&#9472; TABS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(function(btn) {
+    btn.addEventListener('click', function() { goPage(btn.getAttribute('data-page')); });
+  });
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.classList.remove('on');
+  });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  var pg = document.getElementById(id);
+  if (pg) pg.classList.add('on');
+  var tb = document.querySelector('.tab[data-page="' + id + '"]');
+  if (tb) tb.classList.add('on');
+  if (id === 'mplan') renderMealPlan();
+}
+
+// &#9472;&#9472; CLOCK &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function updateClock() {
+  var now = new Date(), h = now.getHours();
+  var clk = document.getElementById('clk');
+  var per = document.getElementById('period');
+  if (clk) clk.textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  var ps = ['MIDNIGHT','LATE NIGHT','LATE NIGHT','LATE NIGHT','LATE NIGHT','EARLY AM','EARLY AM',
+    'MORNING','MORNING','MORNING','MORNING','MORNING','MIDDAY','MIDDAY',
+    'AFTERNOON','AFTERNOON','AFTERNOON','EVENING','EVENING','EVENING','NIGHT','NIGHT','NIGHT','NIGHT'];
+  if (per) per.textContent = ps[h] || 'EVENING';
+}
+
+// &#9472;&#9472; PROFILE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function loadProfile() {
+  var p = storeGet('circadian_profile', null);
+  if (p) { profile = p; profileSaved = true; }
+}
+
+function renderProfile() {
+  var pw = document.getElementById('p-wake');
+  var ps = document.getElementById('p-sleep');
+  if (pw) pw.value = profile.wakeTime;
+  if (ps) ps.value = profile.sleepTime;
+
+  var so = document.getElementById('shift-opts');
+  if (so) {
+    so.innerHTML = '';
+    SHIFTS.forEach(function(s) {
+      var btn = document.createElement('button');
+      btn.className = 'sopt';
+      var active = profile.shiftType === s.id;
+      btn.style.borderColor = active ? 'rgba(45,212,191,.4)' : 'var(--border)';
+      btn.style.background = active ? 'rgba(45,212,191,.12)' : 'rgba(255,255,255,.02)';
+      var inner = document.createElement('div');
+      inner.style.textAlign = 'left';
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:14px;color:var(--cream);margin-bottom:2px';
+      title.textContent = s.l;
+      var sub = document.createElement('div');
+      sub.style.cssText = "font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2)";
+      sub.textContent = s.s;
+      inner.appendChild(title);
+      inner.appendChild(sub);
+      var radio = document.createElement('div');
+      radio.className = 'radio';
+      radio.style.borderColor = active ? 'var(--teal)' : 'var(--muted)';
+      radio.style.background = active ? 'var(--teal)' : 'transparent';
+      if (active) {
+        var rdot = document.createElement('div');
+        rdot.className = 'rdot';
+        radio.appendChild(rdot);
+      }
+      btn.appendChild(inner);
+      btn.appendChild(radio);
+      btn.setAttribute('data-shift', s.id);
+      btn.addEventListener('click', function() {
+        profile.shiftType = this.getAttribute('data-shift');
+        renderProfile();
+      });
+      so.appendChild(btn);
+    });
+  }
+
+  var eo = document.getElementById('eat-opts');
+  if (eo) {
+    eo.innerHTML = '';
+    EATS.forEach(function(e) {
+      var btn = document.createElement('button');
+      btn.className = 'sopt';
+      var active = profile.eatPattern === e.id;
+      btn.style.borderColor = active ? 'rgba(167,139,250,.4)' : 'var(--border)';
+      btn.style.background = active ? 'rgba(167,139,250,.12)' : 'rgba(255,255,255,.02)';
+      var inner = document.createElement('div');
+      inner.style.textAlign = 'left';
+      var title = document.createElement('div');
+      title.style.cssText = "font-family:'DM Mono',monospace;font-size:12px;color:var(--cream);margin-bottom:2px";
+      title.textContent = e.l;
+      var sub = document.createElement('div');
+      sub.style.cssText = "font-family:'DM Mono',monospace;font-size:9px;color:var(--muted2)";
+      sub.textContent = e.s;
+      inner.appendChild(title);
+      inner.appendChild(sub);
+      var radio = document.createElement('div');
+      radio.className = 'radio';
+      radio.style.borderColor = active ? 'var(--lav)' : 'var(--muted)';
+      radio.style.background = active ? 'var(--lav)' : 'transparent';
+      if (active) {
+        var rdot = document.createElement('div');
+        rdot.className = 'rdot';
+        radio.appendChild(rdot);
+      }
+      btn.appendChild(inner);
+      btn.appendChild(radio);
+      btn.setAttribute('data-eat', e.id);
+      btn.addEventListener('click', function() {
+        profile.eatPattern = this.getAttribute('data-eat');
+        var cw = document.getElementById('custom-wrap');
+        if (cw) cw.style.display = profile.eatPattern === 'custom' ? 'block' : 'none';
+        renderProfile();
+      });
+      eo.appendChild(btn);
+    });
+  }
+
+  var cw = document.getElementById('custom-wrap');
+  if (cw) cw.style.display = profile.eatPattern === 'custom' ? 'block' : 'none';
+}
+
+function saveProfile() {
+  var pw = document.getElementById('p-wake');
+  var ps = document.getElementById('p-sleep');
+  var fs = document.getElementById('fast-slide');
+  if (pw && pw.value) profile.wakeTime = pw.value;
+  if (ps && ps.value) profile.sleepTime = ps.value;
+  if (profile.eatPattern === 'custom' && fs) profile.fastingHours = parseInt(fs.value) || 16;
+  storeSet('circadian_profile', profile);
+  profileSaved = true;
+  renderHome();
+  goPage('mplan');
+}
+
+// &#9472;&#9472; CIRCADIAN MATH &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function parseT(t) {
+  var parts = t.split(':');
+  return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+}
+function fmtT(m) {
+  var t = ((m % 1440) + 1440) % 1440;
+  var h = Math.floor(t / 60), mn = t % 60;
+  var ap = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12;
+  return h12 + ':' + (mn < 10 ? '0' : '') + mn + ' ' + ap;
+}
+
+function computePlan() {
+  var wm = parseT(profile.wakeTime), sm = parseT(profile.sleepTime);
+  var winH;
+  if (profile.eatPattern === '168') winH = 8;
+  else if (profile.eatPattern === '1410') winH = 10;
+  else if (profile.eatPattern === '1212') winH = 12;
+  else if (profile.eatPattern === 'custom') winH = 24 - (profile.fastingHours || 16);
+  else winH = Math.round(((sm - wm + 1440) % 1440) / 60);
+  var delay = profile.eatPattern === '168' ? 120 : profile.eatPattern === '1410' ? 90 : 60;
+  var esm = wm + delay, eem = esm + winH * 60;
+  var meals;
+  if (profile.eatPattern === '3meal') {
+    meals = [
+      {name:'Breakfast', time:fmtT(esm + 30), desc:'Protein-first within 1 hour of your eating window open.'},
+      {name:'Lunch', time:fmtT(esm + winH * 30), desc:'Largest meal. Insulin sensitivity peaks midday.'},
+      {name:'Dinner', time:fmtT(eem - 90), desc:'At least 3 hours before sleep. Light and easy to digest.'}
+    ];
+  } else {
+    meals = [
+      {name:'First Meal', time:fmtT(esm), desc:'Break your fast. Prioritise protein and healthy fats.'},
+      {name:'Main Meal', time:fmtT(esm + (winH / 2) * 60), desc:'Largest meal. Maximise nutrient density.'},
+      {name:'Last Meal', time:fmtT(eem - 60), desc:'Close your window. Keep it light.'}
+    ];
+  }
+  var warns = [];
+  if (profile.shiftType === 'night') {
+    warns.push('Night shift: strict TRE is critical. Avoid heavy meals between 12am and 4am - gut motility is lowest.');
+    warns.push('Melatonin at your daytime sleep onset. Blackout curtains essential. Anchor eating to YOUR daylight hours.');
+  }
+  if (profile.shiftType === '12day') {
+    warns.push('12-hour day shifts: a 10-hour eating window (8am-6pm) fits best. Pre-pack all meals to avoid poor choices under time pressure.');
+  }
+  if (profile.shiftType === 'rotating') {
+    warns.push('Rotating shifts: eat only during daylight hours regardless of schedule. Anchor meal timing to light exposure, not the clock (Dr. Satchin Panda).');
+  }
+  return {esm:esm, eem:eem, winH:winH, wm:wm, sm:sm,
+    caff:fmtT(wm + 90), meals:meals, warns:warns,
+    eatStart:fmtT(esm), eatEnd:fmtT(eem)};
+}
+
+// &#9472;&#9472; HOME &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderHome() {
+  var h = new Date().getHours();
+  var ins = INSIGHTS[0];
+  for (var i = 0; i < INSIGHTS.length; i++) {
+    if (h >= INSIGHTS[i].from && h < INSIGHTS[i].to) { ins = INSIGHTS[i]; break; }
+  }
+  var plan = computePlan();
+
+  var ritualRows = ins.rituals.map(function(r, i) {
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:' +
+      (i < ins.rituals.length - 1 ? '1px solid var(--border)' : 'none') + '">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--gold);width:22px;flex-shrink:0;margin-top:2px">' +
+      (i < 9 ? '0' : '') + (i + 1) + '</div>' +
+      '<div style="font-size:13px;color:var(--cream);line-height:1.6">' + r + '</div></div>';
+  }).join('');
+
+  var expertPills = ins.experts.map(function(e) {
+    return '<span class="pill" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)">' + e + '</span>';
+  }).join('');
+
+  var insEl = document.getElementById('home-ins');
+  if (insEl) {
+    insEl.innerHTML = '<div class="gc" style="border-color:rgba(201,168,76,.15);background:linear-gradient(135deg,rgba(201,168,76,.05),var(--glass));margin-bottom:12px">' +
+      '<div class="eyebrow">' + ins.label + ' Protocol</div>' +
+      '<div class="disp">' + ins.label + ' <em>Rituals</em></div>' +
+      ritualRows +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">' + expertPills + '</div></div>';
+  }
+
+  var mealsEl = document.getElementById('home-meals');
+  var winStat = document.getElementById('win-stat');
+  var setupNote = document.getElementById('setup-note');
+
+  if (profileSaved && mealsEl) {
+    var mealRows = plan.meals.map(function(m) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">' +
+        '<div style="font-size:14px;color:var(--cream)">' + m.name + '</div>' +
+        '<div style="font-family:\'DM Mono\',monospace;font-size:14px;color:var(--gold);font-weight:600">' + m.time + '</div></div>';
+    }).join('');
+    mealsEl.innerHTML = '<div class="gc" style="border-color:rgba(201,168,76,.2);margin-bottom:12px">' +
+      '<div class="eyebrow">Today\'s Meal Windows</div>' + mealRows +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted);margin-top:10px">Window: ' +
+      plan.eatStart + ' - ' + plan.eatEnd + ' (' + plan.winH + 'h)</div></div>';
+    if (winStat) winStat.textContent = plan.winH + 'h';
+    if (setupNote) setupNote.style.display = 'none';
+  } else {
+    if (mealsEl) mealsEl.innerHTML = '';
+    if (winStat) winStat.textContent = '--h';
+    if (setupNote) setupNote.style.display = 'block';
+  }
+}
+
+// &#9472;&#9472; MEAL PLAN &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderMealPlan() {
+  var el = document.getElementById('mplan-c');
+  if (!el) return;
+  var plan = computePlan();
+  var SLBLS = {standard:'Standard Day','12day':'12-Hour Day',night:'Night Shift',rotating:'Rotating',flexible:'Flexible'};
+  var ELBLS = {'3meal':'3 Meals','1212':'12:12','1410':'14:10 TRE','168':'16:8 TRE',custom:'Custom Fast'};
+
+  function pct(m) { return (((m % 1440) + 1440) % 1440 / 1440 * 100).toFixed(1); }
+  var sleepW = ((((plan.wm + 1440 - plan.sm) % 1440) / 1440) * 100).toFixed(1);
+  var eatW = (plan.winH / 24 * 100).toFixed(1);
+
+  var ticks = [6, 12, 18].map(function(h) {
+    return '<div style="position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,.08)"></div>';
+  }).join('');
+
+  var timeLabels = ['12am','6am','12pm','6pm','12am'].map(function(t) {
+    return '<div style="font-family:\'DM Mono\',monospace;font-size:8px;color:var(--muted)">' + t + '</div>';
+  }).join('');
+
+  var keyGrid = [
+    ['Wake', profile.wakeTime, 'var(--gold)'],
+    ['Caffeine OK', plan.caff, 'var(--green)'],
+    ['Eating Opens', plan.eatStart, 'var(--gold)'],
+    ['Eating Closes', plan.eatEnd, 'var(--rose)'],
+    ['Window', plan.winH + 'h', 'var(--teal)'],
+    ['Sleep', profile.sleepTime, 'var(--lav)']
+  ].map(function(k) {
+    return '<div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;border:1px solid var(--border)">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">' + k[0] + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:14px;color:' + k[2] + ';font-weight:600">' + k[1] + '</div></div>';
+  }).join('');
+
+  var mealCards = plan.meals.map(function(m) {
+    return '<div style="display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border);margin-bottom:8px">' +
+      '<div style="flex:1">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">' +
+      '<div style="font-size:15px;color:var(--cream)">' + m.name + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:14px;color:var(--gold);font-weight:600;flex-shrink:0;margin-left:8px">' + m.time + '</div></div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted2);line-height:1.5">' + m.desc + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  var warnHtml = '';
+  if (plan.warns.length) {
+    var warnItems = plan.warns.map(function(w) {
+      return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">' +
+        '<div style="color:var(--rose);flex-shrink:0;font-family:\'DM Mono\',monospace;font-size:10px;margin-top:2px">!</div>' +
+        '<div style="font-size:13px;color:var(--cream);line-height:1.7">' + w + '</div></div>';
+    }).join('');
+    warnHtml = '<div class="gc" style="border-color:rgba(248,113,113,.2)">' +
+      '<div class="eyebrow" style="color:var(--rose)">Shift-Specific Guidance</div>' + warnItems +
+      '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' +
+      ['Dr. Satchin Panda','Dr. Andrew Huberman','Dr. Matthew Walker'].map(function(e) {
+        return '<span class="pill" style="background:rgba(167,139,250,.12);color:var(--lav);border:1px solid rgba(167,139,250,.25)">' + e + '</span>';
+      }).join('') + '</div></div>';
+  }
+
+  var whyItems = [
+    ['Dr. Satchin Panda', 'A 10-hour eating window aligned to light exposure is the minimum effective dose for circadian health.'],
+    ['Dr. Jason Fung', 'The overnight fasting window triggers autophagy - cellular cleanup that cannot occur while insulin is elevated.'],
+    ['Dr. Peter Attia', 'Delaying caffeine 90 minutes after waking allows adenosine to clear naturally, producing a sustained energy curve.'],
+    ['Dr. Mark Hyman', 'First meal 1-2 hours after waking allows cortisol to peak naturally, improving insulin sensitivity.']
+  ].map(function(item) {
+    return '<div style="padding:10px 12px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--border);margin-bottom:8px">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:5px">' + item[0] + '</div>' +
+      '<div style="font-size:12px;color:var(--muted2);line-height:1.7">' + item[1] + '</div></div>';
+  }).join('');
+
+  el.innerHTML = '<div style="padding:0 0 24px">' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">' +
+    '<span class="pill" style="background:rgba(45,212,191,.12);color:var(--teal);border:1px solid rgba(45,212,191,.25)">' + (SLBLS[profile.shiftType] || 'Custom') + '</span>' +
+    '<span class="pill" style="background:rgba(167,139,250,.12);color:var(--lav);border:1px solid rgba(167,139,250,.25)">' + (ELBLS[profile.eatPattern] || 'Custom') + '</span>' +
+    '<span class="pill" style="background:var(--gdim);color:var(--gold);border:1px solid rgba(201,168,76,.25)">Wake ' + profile.wakeTime + '</span></div>' +
+    '<div class="eyebrow">Your Optimal Day</div>' +
+    '<div class="disp">Meal &amp; Fasting <em>Timeline</em></div>' +
+    '<div class="gc" style="border-color:rgba(201,168,76,.2)">' +
+    '<div class="eyebrow">24-Hour Window</div>' +
+    '<div class="tlbar">' +
+    '<div style="position:absolute;top:0;bottom:0;left:' + pct(plan.sm) + '%;width:' + sleepW + '%;background:rgba(167,139,250,.25);border-left:2px solid var(--lav)"></div>' +
+    '<div style="position:absolute;top:0;bottom:0;left:' + pct(plan.esm) + '%;width:' + eatW + '%;background:rgba(201,168,76,.3);border-left:2px solid var(--gold);border-right:2px solid var(--gold)"></div>' +
+    ticks + '</div>' +
+    '<div style="display:flex;justify-content:space-between">' + timeLabels + '</div>' +
+    '<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">' +
+    [['var(--lav)','Sleep'],['var(--gold)','Eating'],['rgba(255,255,255,.08)','Fasting']].map(function(it) {
+      return '<div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:' + it[0] + '"></div><div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted2)">' + it[1] + '</div></div>';
+    }).join('') + '</div></div>' +
+    '<div class="gc" style="border-color:rgba(45,212,191,.2)">' +
+    '<div class="eyebrow" style="color:var(--teal)">Key Times</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + keyGrid + '</div></div>' +
+    '<div class="gc" style="border-color:rgba(201,168,76,.2)">' +
+    '<div class="eyebrow">Your Meal Windows</div>' + mealCards + '</div>' +
+    warnHtml +
+    '<div class="gc"><div class="eyebrow">Why This Works</div>' + whyItems + '</div></div>';
+}
+
+// &#9472;&#9472; ASK AI &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function setupAsk() {
+  var mAsk = document.getElementById('mbtn-ask');
+  var mConf = document.getElementById('mbtn-conf');
+  if (mAsk) mAsk.addEventListener('click', function() {
+    chatMode = 'ask';
+    mAsk.classList.add('on');
+    if (mConf) mConf.classList.remove('on');
+    var qi = document.getElementById('qin');
+    if (qi) qi.placeholder = 'Ask your specialist panel anything...';
+  });
+  if (mConf) mConf.addEventListener('click', function() {
+    chatMode = 'conflicts';
+    mConf.classList.add('on');
+    if (mAsk) mAsk.classList.remove('on');
+    var qi = document.getElementById('qin');
+    if (qi) qi.placeholder = 'Which topic should I check for conflicts?';
+  });
+  ['s1','s2','s3','s4'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', function() {
+      var qi = document.getElementById('qin');
+      if (qi) qi.value = btn.textContent;
+      sendMsg();
+    });
+  });
+  var sbtn = document.getElementById('sbtn');
+  if (sbtn) sbtn.addEventListener('click', sendMsg);
+  var qin = document.getElementById('qin');
+  if (qin) qin.addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMsg(); });
+}
+
+function sendMsg() {
+  var inp = document.getElementById('qin');
+  var sbtn = document.getElementById('sbtn');
+  var msgs = document.getElementById('msgs');
+  if (!inp || !msgs) return;
+  var q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  if (sbtn) sbtn.disabled = true;
+  var sugs = document.getElementById('sugs');
+  if (sugs) sugs.parentNode.removeChild(sugs);
+
+  var ud = document.createElement('div');
+  ud.className = 'msg u fu';
+  ud.textContent = q;
+  msgs.appendChild(ud);
+
+  var ld = document.createElement('div');
+  ld.className = 'msg a';
+  ld.innerHTML = '<div style="display:flex;gap:5px;align-items:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  msgs.appendChild(ld);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  var sl = SPECS.map(function(s) { return s.n + ' (' + s.c + ': ' + s.t + ')'; }).join('; ');
+  var sys = chatMode === 'conflicts'
+    ? 'You are a health intelligence tool that identifies CONFLICTS between these world-leading health specialists: ' + sl + '. Clearly show where specialists disagree, name each specialist, present each perspective, and explain WHY they differ.'
+    : 'You are a personal health intelligence assistant with deep knowledge of these specialists: ' + sl + '. Answer by synthesising across relevant specialists. Always name who recommends what. Be practical, specific, and actionable.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:900, system:sys, messages:[{role:'user', content:q}]})
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    var ans = (d.content && d.content[0] && d.content[0].text) ? d.content[0].text : 'No response received.';
+    ld.innerHTML = '<div class="mlbl">Panel Intelligence</div>' + ans.replace(/\n/g, '<br>');
+  }).catch(function() {
+    ld.className = 'msg a e';
+    ld.innerHTML = '<div class="mlbl" style="color:var(--rose)">Hosting Limitation</div>' +
+      '<strong>Ask AI requires Netlify or GitHub Pages hosting.</strong><br><br>' +
+      '1. Go to app.netlify.com/drop<br>2. Upload this HTML file<br>' +
+      '3. Open the new URL in Safari and reinstall<br><br>' +
+      'The AI works perfectly inside the Claude app in the meantime.';
+  }).then(function() {
+    if (sbtn) sbtn.disabled = false;
+    msgs.scrollTop = msgs.scrollHeight;
+  });
+}
+
+// &#9472;&#9472; MEAL AI &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function loadBW() {
+  bwData = storeGet('bw_data', {});
+  ['glucose','hba1c','chol','ldl','hdl','trig','crp','vitd'].forEach(function(k) {
+    var el = document.getElementById('bw-' + k);
+    if (el && bwData[k]) el.value = bwData[k];
+  });
+}
+
+function saveBW() {
+  ['glucose','hba1c','chol','ldl','hdl','trig','crp','vitd'].forEach(function(k) {
+    var el = document.getElementById('bw-' + k);
+    if (el) bwData[k] = el.value;
+  });
+  storeSet('bw_data', bwData);
+  var ok = document.getElementById('bw-ok');
+  if (ok) { ok.style.display = 'block'; setTimeout(function() { ok.style.display = 'none'; }, 2000); }
+}
+
+function handleFile(inp) {
+  var f = inp.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    mealImg = e.target.result;
+    var mi = document.getElementById('meal-img');
+    var mp = document.getElementById('meal-prev');
+    var dz = document.getElementById('drop-zone');
+    var ab = document.getElementById('anal-btn');
+    if (mi) mi.src = mealImg;
+    if (mp) mp.style.display = 'block';
+    if (dz) dz.style.display = 'none';
+    if (ab) ab.disabled = false;
+  };
+  r.readAsDataURL(f);
+}
+
+function analyzeMeal() {
+  var btn = document.getElementById('anal-btn');
+  var res = document.getElementById('meal-res');
+  if (!btn || !res) return;
+  btn.disabled = true; btn.textContent = 'Analysing...';
+  res.style.display = 'none';
+
+  var bwParts = [];
+  var bwLabels = {glucose:'Blood Glucose',hba1c:'HbA1c',chol:'Total Cholesterol',ldl:'LDL',hdl:'HDL',trig:'Triglycerides',crp:'CRP',vitd:'Vitamin D'};
+  Object.keys(bwData).forEach(function(k) { if (bwData[k]) bwParts.push((bwLabels[k] || k) + ': ' + bwData[k]); });
+  var bwStr = bwParts.join(', ');
+
+  var prompt = bwStr
+    ? 'Analyse this meal photo. User bloodwork: ' + bwStr + '. Provide: 1) Nutritional score /10 with one-line verdict. 2) Every food item rated BENEFICIAL, NEUTRAL, or AVOID with brief reason. 3) How this meal interacts with their specific bloodwork markers. 4) Two smart swaps to improve it. 5) Which specialist would approve or flag it: Hyman, Attia, Spector, Longo, Kahn. Use these exact headers: MEAL SCORE | FOOD BREAKDOWN | BLOODWORK INTERACTION | SMART SWAPS | SPECIALIST VERDICT'
+    : 'Analyse this meal photo. Provide: 1) Nutritional score /10 with verdict. 2) Every food item rated BENEFICIAL, NEUTRAL, or AVOID. 3) Macro estimate (protein, carbs, fat, fibre). 4) Top 2 nutritional strengths. 5) Top 2 areas to improve. 6) Which specialist would approve or flag it: Hyman, Attia, Spector, Longo, Kahn. Headers: MEAL SCORE | FOOD BREAKDOWN | MACROS | STRENGTHS | IMPROVE | SPECIALIST VERDICT';
+
+  var b64 = mealImg.split(',')[1];
+  var mt = mealImg.split(';')[0].split(':')[1];
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1200,
+      messages:[{role:'user', content:[
+        {type:'image', source:{type:'base64', media_type:mt, data:b64}},
+        {type:'text', text:prompt}
+      ]}]
+    })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    var txt = (d.content && d.content[0] && d.content[0].text) ? d.content[0].text : 'Could not analyse meal.';
+    renderMealResult(txt, bwStr);
+  }).catch(function() {
+    res.style.display = 'block';
+    res.innerHTML = '<div class="gc" style="border-color:rgba(248,113,113,.2)"><div class="eyebrow" style="color:var(--rose)">Hosting Limitation</div><div style="font-size:13px;color:var(--cream);line-height:1.7">Upload to app.netlify.com/drop to enable the Meal AI feature.</div></div>';
+  }).then(function() {
+    btn.disabled = false; btn.textContent = 'Analyse This Meal';
+  });
+}
+
+function renderMealResult(text, hasBW) {
+  var res = document.getElementById('meal-res');
+  if (!res) return;
+  res.style.display = 'block'; res.innerHTML = '';
+  var sm = text.match(/(\d+)\s*(?:\/\s*10|out of 10)/i);
+  var score = sm ? parseInt(sm[1]) : 5;
+  var sc = score >= 8 ? 'var(--green)' : score >= 5 ? 'var(--gold)' : 'var(--rose)';
+  var sl = score >= 8 ? 'Excellent' : score >= 6 ? 'Good' : score >= 4 ? 'Fair' : 'Poor';
+
+  var sd = document.createElement('div');
+  sd.className = 'gc fu';
+  sd.innerHTML = '<div style="display:flex;align-items:center;gap:16px">' +
+    '<div style="width:70px;height:70px;border-radius:50%;border:2px solid ' + sc + ';display:flex;align-items:center;justify-content:center;flex-direction:column;flex-shrink:0">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:22px;font-weight:600;color:' + sc + ';line-height:1">' + score + '</div>' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:8px;color:' + sc + '">/10</div></div>' +
+    '<div><div style="font-size:16px;color:var(--cream);margin-bottom:4px">' + sl + ' Nutritional Score</div>' +
+    '<div style="font-size:12px;color:var(--muted2)">' + (hasBW ? 'Personalised to your bloodwork' : 'General nutritional analysis') + '</div>' +
+    (hasBW ? '<span class="pill" style="background:var(--gdim);color:var(--gold);border:1px solid rgba(201,168,76,.25);margin-top:6px;display:inline-block">Bloodwork Integrated</span>' : '') +
+    '</div></div>';
+  res.appendChild(sd);
+
+  var fmt = text;
+  var repls = {
+    'MEAL SCORE':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Meal Score</div>',
+    'FOOD BREAKDOWN':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Food Breakdown</div>',
+    'BLOODWORK INTERACTION':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px;color:var(--teal)">Bloodwork Interaction</div>',
+    'MACROS':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Macros</div>',
+    'SMART SWAPS':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Smart Swaps</div>',
+    'STRENGTHS':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Strengths</div>',
+    'IMPROVE':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px">Improve</div>',
+    'SPECIALIST VERDICT':'<div class="eyebrow" style="margin-top:14px;margin-bottom:5px;color:var(--gold)">Specialist Verdict</div>',
+    'BENEFICIAL':'<span class="pill" style="background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.25)">Beneficial</span>',
+    'NEUTRAL':'<span class="pill" style="background:var(--gdim);color:var(--gold);border:1px solid rgba(201,168,76,.25)">Neutral</span>',
+    'AVOID':'<span class="pill" style="background:rgba(248,113,113,.12);color:var(--rose);border:1px solid rgba(248,113,113,.25)">Avoid</span>'
+  };
+  Object.keys(repls).forEach(function(k) { fmt = fmt.split(k).join(repls[k]); });
+  fmt = fmt.split('\n').join('<br>');
+
+  var ad = document.createElement('div');
+  ad.className = 'gc fu';
+  ad.innerHTML = '<div style="font-size:13px;color:var(--cream);line-height:1.8">' + fmt + '</div>';
+  res.appendChild(ad);
+
+  var rb = document.createElement('button');
+  rb.style.cssText = 'display:block;margin:14px auto 0;padding:12px 32px;background:transparent;border:1px solid var(--border);border-radius:30px;color:var(--muted2);font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:2px;cursor:pointer';
+  rb.textContent = 'Analyse Another Meal';
+  rb.addEventListener('click', function() {
+    mealImg = null;
+    var mp = document.getElementById('meal-prev'), dz = document.getElementById('drop-zone');
+    var ab = document.getElementById('anal-btn'), mr = document.getElementById('meal-res');
+    var fi = document.getElementById('file-in');
+    if (mp) mp.style.display = 'none';
+    if (dz) dz.style.display = 'block';
+    if (ab) ab.disabled = true;
+    if (mr) { mr.style.display = 'none'; mr.innerHTML = ''; }
+    if (fi) fi.value = '';
+  });
+  res.appendChild(rb);
+}
+
+// &#9472;&#9472; AUDIO ENGINE &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function preloadMp3s() {
+  var files = {inhale:'inhale.mp3',hold:'hold.mp3',exhale:'exhale.mp3',holdout:'hold-out.mp3',intro:'intro.mp3',complete:'complete.mp3'};
+  Object.keys(files).forEach(function(k) {
+    fetch(files[k]).then(function(r) { return r.ok ? r.blob() : null; }).then(function(b) {
+      if (b) { mp3Cache[k] = URL.createObjectURL(b); mp3Ready = true; }
+    }).catch(function() {});
+  });
+}
+
+function loadVoices() {
+  var pref = ['Samantha','Karen','Moira','Fiona','Tessa','Serena','Victoria','Zoe','Alice','Google UK English Female','Microsoft Zira'];
+  var all = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  var eng = all.filter(function(v) { return v.lang.startsWith('en'); });
+  speechVoices = [];
+  pref.forEach(function(name) {
+    eng.forEach(function(v) { if (v.name.indexOf(name) !== -1 && speechVoices.indexOf(v) === -1) speechVoices.push(v); });
+  });
+  eng.forEach(function(v) { if (speechVoices.indexOf(v) === -1) speechVoices.push(v); });
+}
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playMp3(k) {
+  var u = mp3Cache[k];
+  if (!u) return false;
+  try {
+    if (mp3Player) mp3Player.pause();
+    var a = new Audio(u); a.volume = 0.95; a.play().catch(function() {}); mp3Player = a; return true;
+  } catch(e) { return false; }
+}
+
+function speakAPI(text, cb) {
+  if (!elApiKey) { cb(false); return; }
+  fetch('https://api.elevenlabs.io/v1/text-to-speech/jBpfuIE2acCO8z3wKNLl/stream', {
+    method:'POST', headers:{'Content-Type':'application/json','xi-api-key':elApiKey},
+    body: JSON.stringify({text:text, model_id:'eleven_turbo_v2_5', voice_settings:{stability:.75,similarity_boost:.85,style:.3}})
+  }).then(function(r) { return r.ok ? r.blob() : null; }).then(function(b) {
+    if (!b) { cb(false); return; }
+    if (mp3Player) mp3Player.pause();
+    var a = new Audio(URL.createObjectURL(b)); a.volume = 0.95; a.play().catch(function() {}); mp3Player = a; cb(true);
+  }).catch(function() { cb(false); });
+}
+
+function speakSpeech(text) {
+  try {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var v = speechVoices[speechIdx] || speechVoices[0];
+    if (v) u.voice = v;
+    u.rate = 0.72; u.pitch = 1.08; u.volume = 0.92;
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+function speak(text, fileKey) {
+  if (!voiceOn) return;
+  if (fileKey && playMp3(fileKey)) return;
+  speakAPI(text, function(ok) { if (!ok) speakSpeech(text); });
+}
+
+function startAmb() {
+  if (!ambOn) return;
+  try {
+    stopAmb();
+    var c = getCtx(), o1 = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+    o1.type = 'sine'; o1.frequency.value = 136.1;
+    o2.type = 'sine'; o2.frequency.value = 138.5;
+    g.gain.setValueAtTime(0, c.currentTime);
+    g.gain.linearRampToValueAtTime(0.05, c.currentTime + 2.5);
+    o1.connect(g); o2.connect(g); g.connect(c.destination);
+    o1.start(); o2.start();
+    ambOscs = [o1, o2]; ambGain = g;
+  } catch(e) {}
+}
+
+function stopAmb() {
+  try {
+    if (ambGain && audioCtx) {
+      ambGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.2);
+      if (ambOscs) ambOscs.forEach(function(o) { setTimeout(function() { try { o.stop(); } catch(e) {} }, 1300); });
+    }
+  } catch(e) {}
+  ambOscs = null; ambGain = null;
+}
+
+function playTone(phase, freq, dur) {
+  if (!toneOn) return;
+  try {
+    var c = getCtx(), now = c.currentTime, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine';
+    if (phase === 'Inhale') {
+      o.frequency.setValueAtTime(freq * 0.82, now); o.frequency.linearRampToValueAtTime(freq, now + dur * 0.75);
+      g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.18, now + 0.4); g.gain.linearRampToValueAtTime(0, now + dur);
+    } else if (phase === 'Exhale') {
+      o.frequency.setValueAtTime(freq, now); o.frequency.linearRampToValueAtTime(freq * 0.72, now + dur * 0.85);
+      g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.15, now + 0.4); g.gain.linearRampToValueAtTime(0, now + dur);
+    } else {
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.08, now + 0.4); g.gain.setValueAtTime(0.08, now + dur - 0.4); g.gain.linearRampToValueAtTime(0, now + dur);
+    }
+    o.connect(g); g.connect(c.destination); o.start(now); o.stop(now + dur + 0.1);
+  } catch(e) {}
+}
+
+function stopAllAudio() {
+  stopAmb();
+  try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch(e) {}
+  try { if (mp3Player) { mp3Player.pause(); mp3Player = null; } } catch(e) {}
+}
+
+function haptic(p) { try { navigator.vibrate && navigator.vibrate(p); } catch(e) {} }
+
+// &#9472;&#9472; BREATHWORK &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderBreathList() {
+  var bl = document.getElementById('blist');
+  if (!bl) return;
+  BMETHS.forEach(function(m) {
+    var steps = [{l:'Inhale',v:m.inhale,c:m.ac}];
+    if (m.hold1) steps.push({l:'Hold',v:m.hold1,c:m.ac + '99'});
+    steps.push({l:'Exhale',v:m.exhale,c:m.gl});
+    if (m.hold2) steps.push({l:'Hold',v:m.hold2,c:m.gl + '99'});
+    var visLabel = {rings:'Expanding Rings',box:'Traced Box',dial:'Counting Dial'}[m.vis] || m.vis;
+    var stepTags = steps.map(function(s) {
+      return '<div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:6px 12px">' +
+        '<div style="width:7px;height:7px;border-radius:50%;background:' + s.c + ';box-shadow:0 0 8px ' + s.c + '"></div>' +
+        '<span style="font-family:\'DM Mono\',monospace;font-size:9px;color:' + s.c + 'cc;letter-spacing:1px">' + s.l + '</span>' +
+        '<span style="font-family:\'DM Mono\',monospace;font-size:13px;color:var(--cream);font-weight:600">' + s.v + 's</span></div>';
+    }).join('');
+    var card = document.createElement('div');
+    card.className = 'bmcard';
+    card.innerHTML = '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,' + m.ac + '60,' + m.gl + ',transparent);opacity:.6"></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">' +
+      '<div><div style="font-size:17px;font-weight:400;color:var(--cream);margin-bottom:4px">' + m.name + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:' + m.ac + ';letter-spacing:2px;text-transform:uppercase">' + m.expert + '</div></div>' +
+      '<span class="pill" style="background:' + m.ac + '15;color:' + m.ac + ';border:1px solid ' + m.ac + '35">' + visLabel + '</span></div>' +
+      '<div style="font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:14px">' + m.tag + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + stepTags + '</div>';
+    card.addEventListener('mouseenter', function() { card.style.borderColor = m.ac + '40'; card.style.background = m.ac + '08'; });
+    card.addEventListener('mouseleave', function() { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--glass)'; });
+    (function(method) { card.addEventListener('click', function() { startBreath(method); }); })(m);
+    bl.appendChild(card);
+  });
+}
+
+function startBreath(m) {
+  breathMethod = m; breathDone = false; breathCycle = 0; breathProg = 0; breathPhase = 'Ready'; audioOnly = false;
+  var bl = document.getElementById('blist'), bs = document.getElementById('bsession');
+  if (bl) bl.style.display = 'none';
+  if (bs) bs.style.display = 'block';
+  drawSession();
+  startAmb();
+  speak('Get comfortable and close your eyes.', 'intro');
+  setTimeout(function() { runCycle(0); }, 2000);
+}
+
+function stopBreath() {
+  if (breathRAF) { cancelAnimationFrame(breathRAF); breathRAF = null; }
+  stopAllAudio();
+  breathMethod = null; audioOnly = false;
+  var bl = document.getElementById('blist'), bs = document.getElementById('bsession');
+  if (bs) { bs.style.display = 'none'; bs.innerHTML = ''; }
+  if (bl) bl.style.display = 'block';
+}
+
+function runCycle(n) {
+  if (!breathMethod) return;
+  if (n >= breathMethod.cycles) {
+    breathDone = true;
+    speak('Session complete. Take a moment.', 'complete');
+    stopAmb();
+    haptic([100,50,100,50,200]);
+    drawSession();
+    return;
+  }
+  breathCycle = n + 1;
+  var steps = [{label:'Inhale',dur:breathMethod.inhale*1000}];
+  if (breathMethod.hold1) steps.push({label:'Hold (in)',dur:breathMethod.hold1*1000});
+  steps.push({label:'Exhale',dur:breathMethod.exhale*1000});
+  if (breathMethod.hold2) steps.push({label:'Hold (out)',dur:breathMethod.hold2*1000});
+  var si = 0;
+  function next() {
+    if (!breathMethod) return;
+    if (si >= steps.length) { runCycle(n + 1); return; }
+    var s = steps[si++];
+    runPhase(s.label, s.dur, next);
+  }
+  next();
+}
+
+function runPhase(label, dur, onDone) {
+  if (!breathMethod) return;
+  breathPhase = label; breathProg = 0;
+  var fkMap = {Inhale:'inhale','Hold (in)':'hold','Hold (out)':'holdout',Exhale:'exhale'};
+  speak(label === 'Hold (in)' || label === 'Hold (out)' ? 'Hold' : label, fkMap[label]);
+  var freq = label === 'Inhale' ? breathMethod.ti : label.indexOf('Hold') !== -1 ? breathMethod.th : breathMethod.te;
+  playTone(label, freq, dur / 1000);
+  haptic(label === 'Inhale' ? [80] : label.indexOf('Hold') !== -1 ? [40,40,40] : [200]);
+  var start = performance.now();
+  function tick(now) {
+    var p = Math.min((now - start) / dur, 1);
+    breathProg = p;
+    drawSession();
+    if (p < 1) breathRAF = requestAnimationFrame(tick);
+    else onDone();
+  }
+  breathRAF = requestAnimationFrame(tick);
+}
+
+function drawSession() {
+  var bs = document.getElementById('bsession');
+  if (!bs || !breathMethod) return;
+  var m = breathMethod;
+  var pmap = {Inhale:'Inhale','Hold (in)':'Hold',Exhale:'Exhale','Hold (out)':'Hold',Ready:'...'};
+  var ph = pmap[breathPhase] || breathPhase;
+  var pcol = {Inhale:m.ac,'Hold (in)':m.ac+'80',Exhale:m.gl,'Hold (out)':m.gl+'80'}[breathPhase] || m.ac;
+
+  var visual = '';
+  if (breathDone) {
+    visual = '<div style="text-align:center;padding:40px 0">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:52px;color:' + m.ac + ';margin-bottom:12px;text-shadow:0 0 40px ' + m.ac + '">&#10003;</div>' +
+      '<div style="font-size:22px;font-weight:300;color:var(--cream);margin-bottom:8px">Session Complete</div>' +
+      '<div style="font-size:13px;color:var(--muted2);line-height:1.8">' + m.cycles + ' cycles done. Take a moment.</div></div>';
+  } else if (audioOnly) {
+    visual = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:20px">' +
+      '<div style="font-size:64px;font-weight:300;color:' + pcol + ';letter-spacing:3px;text-shadow:0 0 40px ' + pcol + '80;transition:color .5s">' + ph + '</div>' +
+      '<div style="width:14px;height:14px;border-radius:50%;background:' + pcol + ';box-shadow:0 0 20px ' + pcol + ',0 0 40px ' + pcol + '60;animation:bPulse 2s ease-in-out infinite alternate"></div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);letter-spacing:3px">Cycle ' + breathCycle + ' / ' + m.cycles + '</div></div>';
+  } else if (m.vis === 'box') { visual = drawBox(m);
+  } else if (m.vis === 'dial') { visual = drawDial(m);
+  } else { visual = drawRings(m); }
+
+  var progBar = !breathDone && !audioOnly
+    ? '<div style="text-align:center">' +
+      '<div style="font-size:42px;font-weight:300;color:var(--cream);letter-spacing:2px;line-height:1;margin-bottom:10px">' + ph + '</div>' +
+      '<div style="width:150px;height:3px;background:rgba(255,255,255,.06);border-radius:3px;margin:0 auto 10px;overflow:hidden">' +
+      '<div style="height:3px;border-radius:3px;width:' + (breathProg*100) + '%;background:linear-gradient(90deg,' + m.ac + '80,' + m.gl + ');box-shadow:0 0 10px ' + m.ac + ';transition:width .05s linear"></div></div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);letter-spacing:3px">Cycle ' + breathCycle + ' / ' + m.cycles + '</div></div>' : '';
+
+  var qualLabel = mp3Ready ? 'MP3 Voice' : elApiKey ? 'ElevenLabs' : 'System Voice';
+  var qualCol = mp3Ready ? 'var(--green)' : elApiKey ? 'var(--blue)' : 'var(--gold)';
+
+  bs.innerHTML =
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:16px 16px 32px;background:radial-gradient(ellipse 60% 50% at 50% 60%,' + m.ac + '10 0%,transparent 70%)">' +
+    '<div style="text-align:center">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:4px;color:' + m.ac + ';text-transform:uppercase;margin-bottom:4px">' + m.expert + '</div>' +
+    '<div style="font-size:18px;font-weight:300;color:var(--cream)">' + m.name + '</div></div>' +
+    '<div id="audio-wrap" style="width:100%;max-width:400px">' +
+    '<div id="audio-hdr" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px 16px;cursor:pointer">' +
+    '<div style="display:flex;align-items:center;gap:10px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:' + (voiceOn||toneOn?m.ac:'var(--muted)') + '">&#9834;</div>' +
+    '<div><div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Audio Guide</div>' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:8px;color:' + qualCol + ';margin-top:1px">' + qualLabel + '</div></div>' +
+    '<div style="display:flex;gap:3px">' +
+    [voiceOn,toneOn,ambOn].map(function(on) {
+      return '<div style="width:5px;height:5px;border-radius:50%;background:' + (on?m.ac:'rgba(255,255,255,.1)') + ';box-shadow:' + (on?'0 0 4px '+m.ac:'none') + '"></div>';
+    }).join('') +
+    '</div></div><div id="achev" style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted)">&#9662;</div></div>' +
+    '<div id="audio-body" style="display:none;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:8px">' +
+    '<div style="display:flex;gap:8px;margin-bottom:10px">' +
+    [['Voice',voiceOn,'voice-tog'],['Tones',toneOn,'tone-tog'],['Ambient',ambOn,'amb-tog']].map(function(row) {
+      return '<button id="' + row[2] + '" style="flex:1;padding:8px 4px;border-radius:10px;cursor:pointer;background:' + (row[1]?m.ac+'18':'rgba(255,255,255,.03)') + ';border:1px solid ' + (row[1]?m.ac+'40':'var(--border)') + ';display:flex;flex-direction:column;align-items:center;gap:4px">' +
+        '<div style="width:7px;height:7px;border-radius:50%;background:' + (row[1]?m.ac:'var(--muted)') + ';box-shadow:' + (row[1]?'0 0 6px '+m.ac:'none') + '"></div>' +
+        '<div style="font-family:\'DM Mono\',monospace;font-size:8px;letter-spacing:1px;color:' + (row[1]?m.ac:'var(--muted)') + ';text-transform:uppercase">' + row[0] + '</div></button>';
+    }).join('') +
+    '</div>' +
+    '<button id="eyes-tog" style="width:100%;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:' + (audioOnly?m.ac+'18':'rgba(255,255,255,.02)') + ';border:1px solid ' + (audioOnly?m.ac+'50':'var(--border)') + ';border-radius:10px;cursor:pointer;margin-bottom:10px">' +
+    '<div style="text-align:left"><div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:2px;color:' + (audioOnly?m.ac:'var(--muted)') + ';text-transform:uppercase;margin-bottom:2px">Eyes-Closed Mode</div>' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:' + (audioOnly?'var(--cream)':'var(--muted)') + '">' + (audioOnly?'Screen hidden - audio guides you':'Hide screen for full audio practice') + '</div></div>' +
+    '<div style="width:34px;height:18px;border-radius:9px;background:' + (audioOnly?m.ac:'rgba(255,255,255,.08)') + ';position:relative;flex-shrink:0"><div style="position:absolute;top:3px;left:' + (audioOnly?'16px':'3px') + ';width:12px;height:12px;border-radius:50%;background:white;transition:left .25s"></div></div></button>' +
+    '<button id="el-show" style="width:100%;padding:9px 12px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:10px;cursor:pointer;font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:1px;color:var(--gold);text-align:left;text-transform:uppercase">' + (elApiKey?'ElevenLabs Connected':'Add ElevenLabs for Human Voice') + ' &#9662;</button>' +
+    '<div id="el-body" style="display:none;margin-top:8px">' +
+    '<input id="el-key" type="password" placeholder="Paste ElevenLabs API key..." value="' + (elApiKey||'') + '" style="width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:9px 12px;color:var(--cream);font-family:\'DM Mono\',monospace;font-size:11px;outline:none;margin-bottom:6px">' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:8px;color:var(--muted);line-height:1.7">Free at elevenlabs.io - uses Saavi, a warm meditative female voice.</div></div>' +
+    '</div></div>' +
+    visual + progBar +
+    '<button id="stop-btn" style="padding:13px 48px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:40px;color:var(--muted);font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer">' +
+    (breathDone ? 'Back to Methods' : 'End Session') + '</button></div>';
+
+  // Wire up audio panel buttons - all via addEventListener, zero inline handlers
+  document.getElementById('stop-btn').addEventListener('click', stopBreath);
+
+  document.getElementById('audio-hdr').addEventListener('click', function() {
+    var body = document.getElementById('audio-body');
+    var chev = document.getElementById('achev');
+    var open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : 'block';
+    if (chev) chev.innerHTML = open ? '&#9662;' : '&#9652;';
+  });
+
+  document.getElementById('voice-tog').addEventListener('click', function() { voiceOn = !voiceOn; drawSession(); });
+  document.getElementById('tone-tog').addEventListener('click', function() { toneOn = !toneOn; drawSession(); });
+  document.getElementById('amb-tog').addEventListener('click', function() {
+    ambOn = !ambOn;
+    if (!ambOn) stopAmb(); else startAmb();
+    drawSession();
+  });
+  document.getElementById('eyes-tog').addEventListener('click', function() { audioOnly = !audioOnly; drawSession(); });
+  document.getElementById('el-show').addEventListener('click', function() {
+    var eb = document.getElementById('el-body');
+    if (eb) eb.style.display = eb.style.display === 'none' ? 'block' : 'none';
+  });
+  var elk = document.getElementById('el-key');
+  if (elk) elk.addEventListener('input', function() { elApiKey = elk.value; });
+}
+
+// Breath visuals
+function drawRings(m) {
+  var isIn = breathPhase === 'Inhale', isEx = breathPhase === 'Exhale';
+  var sc = isIn ? 0.42 + breathProg*0.58 : isEx ? 1 - breathProg*0.58 : breathPhase === 'Hold (in)' ? 1 : 0.42;
+  var dur = isIn ? m.inhale : isEx ? m.exhale : 0.5;
+  var ease = isIn ? 'cubic-bezier(0.25,0,0.0,1.0)' : isEx ? 'cubic-bezier(1.0,0,0.75,1.0)' : 'ease';
+  return '<div style="position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center">' +
+    '<div style="position:absolute;width:' + (250*sc) + 'px;height:' + (250*sc) + 'px;border-radius:50%;background:radial-gradient(circle,' + m.ac + '18 0%,transparent 70%);transition:all ' + dur + 's ' + ease + ';filter:blur(' + (16*sc) + 'px)"></div>' +
+    [[105,6,.15],[78,10,.25],[52,14,.5],[26,20,.85]].map(function(r) {
+      return '<div style="position:absolute;width:' + (r[0]*2*sc) + 'px;height:' + (r[0]*2*sc) + 'px;border-radius:50%;border:' + r[1] + 'px solid ' + m.ac + ';opacity:' + (sc<.6?r[2]*.4:r[2]) + ';transition:all ' + dur + 's ' + ease + ';box-shadow:0 0 ' + (r[1]*2+8) + 'px ' + m.ac + ',0 0 ' + (r[1]*4+20) + 'px ' + m.ac + '60"></div>';
+    }).join('') +
+    '<div style="position:absolute;width:' + (50*sc) + 'px;height:' + (50*sc) + 'px;border-radius:50%;background:radial-gradient(circle,' + m.gl + ',' + m.ac + '80);box-shadow:0 0 20px ' + m.ac + ',0 0 40px ' + m.ac + '80;transition:all ' + dur + 's ' + ease + ';z-index:2"></div></div>';
+}
+
+function drawBox(m) {
+  var S = 170, pad = 28, W = S + pad*2;
+  var Cs = [{x:pad,y:pad+S},{x:pad+S,y:pad+S},{x:pad+S,y:pad},{x:pad,y:pad}];
+  var piMap = {Inhale:0,'Hold (in)':1,Exhale:2,'Hold (out)':3};
+  var idx = piMap[breathPhase] !== undefined ? piMap[breathPhase] : 0;
+  var done = idx*S + breathProg*S;
+  function lerp(a,b,t) { return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}; }
+  function bp(len) {
+    var p = 'M ' + Cs[0].x + ' ' + Cs[0].y;
+    for (var i=0;i<4;i++) { if(len<=i*S)break; var fr=Math.min((len-i*S)/S,1),pt=lerp(Cs[i],Cs[(i+1)%4],fr); p+=' L '+pt.x+' '+pt.y; if(fr<1)break; }
+    return p;
+  }
+  function dp(len) { var si=Math.min(Math.floor(len/S),3),fr=(len%S)/S; return lerp(Cs[si],Cs[(si+1)%4],fr); }
+  var dot = dp(Math.min(done,S*4-1));
+  var pcMap = {Inhale:m.ac,'Hold (in)':m.ac+'aa',Exhale:m.gl,'Hold (out)':m.gl+'aa'};
+  var pc = pcMap[breathPhase] || m.ac;
+  var labs = [{x:Cs[0].x,y:Cs[0].y,t:'INHALE',n:m.inhale,c:m.ac,a:'end',dy:22},{x:Cs[1].x,y:Cs[1].y,t:'HOLD',n:m.hold1,c:m.ac+'99',a:'start',dy:22},{x:Cs[2].x,y:Cs[2].y,t:'EXHALE',n:m.exhale,c:m.gl,a:'start',dy:-14},{x:Cs[3].x,y:Cs[3].y,t:'HOLD',n:m.hold2,c:m.gl+'99',a:'end',dy:-14}];
+  return '<svg width="' + W + '" height="' + W + '" style="overflow:visible">' +
+    '<defs><filter id="f1"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+    '<filter id="f2"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
+    '<rect x="' + pad + '" y="' + pad + '" width="' + S + '" height="' + S + '" fill="none" stroke="' + m.ac + '12" stroke-width="8" rx="4"/>' +
+    (done>0 ? '<path d="' + bp(done) + '" fill="none" stroke="' + pc + '" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity=".14" filter="url(#f2)"/><path d="' + bp(done) + '" fill="none" stroke="' + pc + '" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#f1)"/>' : '') +
+    Cs.map(function(c,i) { var lit=done>=i*S; return '<circle cx="' + c.x + '" cy="' + c.y + '" r="' + (lit?15:7) + '" fill="' + (lit?pc+'20':'transparent') + '" stroke="' + (lit?pc:m.ac+'20') + '" stroke-width="2"/><circle cx="' + c.x + '" cy="' + c.y + '" r="' + (lit?6:3) + '" fill="' + (lit?pc:m.ac+'30') + '" style="filter:' + (lit?'drop-shadow(0 0 8px '+pc+')':'none') + '"/>'; }).join('') +
+    (done>0&&done<S*4 ? '<circle cx="' + dot.x + '" cy="' + dot.y + '" r="20" fill="' + pc + '15" stroke="' + pc + '30" stroke-width="1"/><circle cx="' + dot.x + '" cy="' + dot.y + '" r="12" fill="' + pc + '25" stroke="' + pc + '50" stroke-width="1.5"/><circle cx="' + dot.x + '" cy="' + dot.y + '" r="7" fill="' + pc + '" style="filter:drop-shadow(0 0 12px ' + pc + ') drop-shadow(0 0 24px ' + pc + '80)"/>' : '') +
+    labs.map(function(l,i) { var lit=done>=i*S,ox=l.a==='end'?-8:8; return '<text x="' + (l.x+ox) + '" y="' + (l.y+l.dy) + '" text-anchor="' + l.a + '" font-size="9" font-family="\'DM Mono\',monospace" letter-spacing="2" fill="' + (lit?l.c:'#3d5060') + '">' + l.t + '</text><text x="' + (l.x+ox) + '" y="' + (l.y+l.dy+18) + '" text-anchor="' + l.a + '" font-size="20" font-family="\'DM Mono\',monospace" font-weight="700" fill="' + (lit?l.c:'#3d506060') + '">' + l.n + 's</text>'; }).join('') +
+    '</svg>';
+}
+
+function drawDial(m) {
+  var total = m.inhale + m.hold1 + m.exhale, cx = 125, cy = 125, R = 90;
+  var elaps = breathPhase==='Inhale' ? breathProg*m.inhale : breathPhase==='Hold (in)' ? m.inhale+breathProg*m.hold1 : breathPhase==='Exhale' ? m.inhale+m.hold1+breathProg*m.exhale : 0;
+  var sf = elaps/total, sa = -Math.PI/2, sw = sf*2*Math.PI;
+  function pt(a,r) { return {x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}; }
+  var ae = pt(sa+sw,R), la = sw>Math.PI?1:0;
+  var segs = [{l:'INHALE',c:m.ac,sf:0,ef:m.inhale/total},{l:'HOLD',c:m.ac+'80',sf:m.inhale/total,ef:(m.inhale+m.hold1)/total},{l:'EXHALE',c:m.gl,sf:(m.inhale+m.hold1)/total,ef:1}];
+  var ac2 = breathPhase==='Inhale'?m.ac:breathPhase==='Hold (in)'?m.ac+'88':m.gl;
+  var ticks = '';
+  for (var i=0;i<total;i++) {
+    var f=i/total,a2=sa+f*2*Math.PI,tc=m.ac;
+    for(var j=0;j<segs.length;j++){if(f>=segs[j].sf&&f<segs[j].ef){tc=segs[j].c;break;}}
+    var inn=pt(a2,R-10),out=pt(a2,R+10),lp=pt(a2,R+26),isCur=Math.floor(sf*total)===i,isEl=f<sf;
+    ticks += '<line x1="'+inn.x+'" y1="'+inn.y+'" x2="'+out.x+'" y2="'+out.y+'" stroke="'+(isEl?tc:'#3d506030')+'" stroke-width="'+(isCur?4:2)+'" style="filter:'+(isCur?'drop-shadow(0 0 6px '+tc+')':'none')+'"/>';
+    ticks += '<text x="'+lp.x+'" y="'+lp.y+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(isCur?12:9)+'" font-family="\'DM Mono\',monospace" font-weight="'+(isCur?700:400)+'" fill="'+(isCur?tc:isEl?tc+'80':'#3d506050')+'" style="filter:'+(isCur?'drop-shadow(0 0 8px '+tc+')':'none')+'">'+(i+1)+'</text>';
+  }
+  var arcPt = pt(sa,R), cur = Math.min(Math.ceil(elaps),total);
+  return '<svg width="250" height="250" style="overflow:visible">' +
+    '<defs><filter id="d1"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+    '<filter id="d2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+m.ac+'08" stroke-width="28"/>' +
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+m.ac+'15" stroke-width="14"/>' +
+    ticks +
+    (sw>0.01 ?
+      '<path d="M '+arcPt.x+' '+arcPt.y+' A '+R+' '+R+' 0 '+la+' 1 '+ae.x+' '+ae.y+'" fill="none" stroke="'+ac2+'" stroke-width="28" stroke-linecap="round" opacity=".18" filter="url(#d1)"/>' +
+      '<path d="M '+arcPt.x+' '+arcPt.y+' A '+R+' '+R+' 0 '+la+' 1 '+ae.x+' '+ae.y+'" fill="none" stroke="'+ac2+'" stroke-width="14" stroke-linecap="round" filter="url(#d2)"/>' +
+      '<circle cx="'+ae.x+'" cy="'+ae.y+'" r="20" fill="'+ac2+'15" stroke="'+ac2+'25" stroke-width="1"/>' +
+      '<circle cx="'+ae.x+'" cy="'+ae.y+'" r="13" fill="'+ac2+'25" stroke="'+ac2+'50" stroke-width="2"/>' +
+      '<circle cx="'+ae.x+'" cy="'+ae.y+'" r="8" fill="'+ac2+'" style="filter:drop-shadow(0 0 16px '+ac2+') drop-shadow(0 0 32px '+ac2+'80)"/>' : '') +
+    segs.map(function(seg,i) {
+      var mid=(seg.sf+seg.ef)/2,ang=sa+mid*2*Math.PI,lp2=pt(ang,R-40);
+      var ia=(breathPhase==='Inhale'&&i===0)||(breathPhase==='Hold (in)'&&i===1)||(breathPhase==='Exhale'&&i===2);
+      return '<text x="'+lp2.x+'" y="'+lp2.y+'" text-anchor="middle" dominant-baseline="middle" font-size="8" font-family="\'DM Mono\',monospace" letter-spacing="2" fill="'+(ia?seg.c:seg.c+'50')+'">'+seg.l+'</text>';
+    }).join('') +
+    '<circle cx="'+cx+'" cy="'+cy+'" r="40" fill="'+m.ac+'08" stroke="'+m.ac+'15" stroke-width="1.5"/>' +
+    '<text x="'+cx+'" y="'+(cy-11)+'" text-anchor="middle" font-size="8" font-family="\'DM Mono\',monospace" fill="#3d5060" letter-spacing="3">'+(breathPhase||'').toUpperCase().replace(' (IN)','').replace(' (OUT)','')+' </text>' +
+    '<text x="'+cx+'" y="'+(cy+15)+'" text-anchor="middle" font-size="30" font-family="\'DM Mono\',monospace" font-weight="700" fill="'+ac2+'" style="filter:drop-shadow(0 0 12px '+ac2+'80)">'+cur+'</text>' +
+    '</svg>';
+}
+
+// &#9472;&#9472; TRACKS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderTracks() {
+  var c = document.getElementById('tracks-c');
+  if (!c) return;
+  TRACKS.forEach(function(t, ti) {
+    trackDone[ti] = trackDone[ti] || {};
+    var card = document.createElement('div');
+    card.className = 'tcard';
+    var specPills = t.specs.map(function(s) {
+      return '<span class="pill" style="background:' + t.col + '18;color:' + t.col + ';border:1px solid ' + t.col + '30">' + s + '</span>';
+    }).join('');
+    var stepItems = t.steps.map(function(step, si) {
+      return '<div class="tstep" id="ts-' + ti + '-' + si + '">' +
+        '<div class="chk" id="chk-' + ti + '-' + si + '" style="border-color:var(--muted)"></div>' +
+        '<div class="step-txt">' + step + '</div></div>';
+    }).join('');
+    card.innerHTML =
+      '<div id="thdr-' + ti + '" style="display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;margin-bottom:10px">' +
+      '<div><div style="font-size:18px;font-weight:300;color:var(--cream)">' + t.title + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted2);margin-top:3px;letter-spacing:1px;text-transform:uppercase">' + t.weeks + ' weeks &middot; ' + t.specs.length + ' specialists</div></div>' +
+      '<div style="text-align:right">' +
+      '<div id="pct-' + ti + '" style="font-family:\'DM Mono\',monospace;font-size:18px;color:' + t.col + '">0%</div>' +
+      '<div id="sub-' + ti + '" style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted2)">0/' + t.steps.length + '</div></div></div>' +
+      '<div class="pbar"><div class="pfill" id="prog-' + ti + '" style="background:' + t.col + ';width:0%"></div></div>' +
+      '<div id="tsteps-' + ti + '" style="display:none;margin-top:10px">' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + specPills + '</div>' +
+      stepItems + '</div>';
+    c.appendChild(card);
+
+    document.getElementById('thdr-' + ti).addEventListener('click', (function(i) {
+      return function() {
+        var s = document.getElementById('tsteps-' + i);
+        if (s) s.style.display = s.style.display === 'none' ? 'block' : 'none';
+      };
+    })(ti));
+
+    t.steps.forEach(function(step, si) {
+      var el = document.getElementById('ts-' + ti + '-' + si);
+      if (el) el.addEventListener('click', (function(i,j) { return function() { toggleStep(i,j); }; })(ti,si));
+    });
+  });
+}
+
+function toggleStep(ti, si) {
+  trackDone[ti] = trackDone[ti] || {};
+  trackDone[ti][si] = !trackDone[ti][si];
+  var done = 0;
+  Object.keys(trackDone[ti]).forEach(function(k) { if (trackDone[ti][k]) done++; });
+  var total = TRACKS[ti].steps.length, pct = Math.round(done/total*100), col = TRACKS[ti].col;
+  var pEl = document.getElementById('pct-' + ti), sEl2 = document.getElementById('sub-' + ti), prEl = document.getElementById('prog-' + ti);
+  if (pEl) pEl.textContent = pct + '%';
+  if (sEl2) sEl2.textContent = done + '/' + total;
+  if (prEl) prEl.style.width = pct + '%';
+  var isDone = trackDone[ti][si];
+  var stepEl = document.getElementById('ts-' + ti + '-' + si);
+  var chkEl = document.getElementById('chk-' + ti + '-' + si);
+  if (stepEl) { if (isDone) stepEl.classList.add('done'); else stepEl.classList.remove('done'); stepEl.style.borderColor = isDone ? col : 'var(--border)'; stepEl.style.background = isDone ? col+'08' : 'transparent'; }
+  if (chkEl) { chkEl.style.background = isDone ? col : 'transparent'; chkEl.style.borderColor = isDone ? col : 'var(--muted)'; chkEl.innerHTML = isDone ? '&#10003;' : ''; }
+}
+
+// &#9472;&#9472; CONFLICTS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderConflicts() {
+  var c = document.getElementById('conf-c');
+  if (!c) return;
+  CONFLICTS.forEach(function(conf, i) {
+    var card = document.createElement('div');
+    card.className = 'ccard';
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<div><div style="font-size:18px;font-weight:300;color:var(--cream)">' + conf.topic + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted2);margin-top:4px;letter-spacing:1px;text-transform:uppercase">' + conf.a + ' vs ' + conf.b + '</div></div>' +
+      '<div id="chev-' + i + '" style="color:var(--rose);font-size:14px;font-family:\'DM Mono\',monospace">&#9662;</div></div>' +
+      '<div id="cbody-' + i + '" style="display:none;margin-top:14px">' +
+      '<div style="background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:14px;margin-bottom:10px">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:1px;color:var(--teal);text-transform:uppercase;margin-bottom:7px">' + conf.a + '</div>' +
+      '<div style="font-size:13px;color:var(--cream);line-height:1.7">' + conf.av + '</div></div>' +
+      '<div style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:1px;color:var(--rose);text-transform:uppercase;margin-bottom:7px">' + conf.b + '</div>' +
+      '<div style="font-size:13px;color:var(--cream);line-height:1.7">' + conf.bv + '</div></div></div>';
+    card.addEventListener('click', (function(idx) {
+      return function() {
+        var body = document.getElementById('cbody-' + idx);
+        var chev = document.getElementById('chev-' + idx);
+        var open = body.style.display === 'block';
+        body.style.display = open ? 'none' : 'block';
+        if (chev) chev.innerHTML = open ? '&#9662;' : '&#9652;';
+      };
+    })(i));
+    c.appendChild(card);
+  });
+}
+
+// &#9472;&#9472; SUPPLEMENTS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderSupps() {
+  var el = document.getElementById('supps-c');
+  if (!el) return;
+  var times = ['Morning','Lunch','Evening'];
+  var cols = {Morning:'var(--gold)',Lunch:'var(--green)',Evening:'var(--lav)'};
+  var html = '';
+  times.forEach(function(t) {
+    html += '<div style="margin-bottom:22px"><div class="eyebrow" style="color:' + cols[t] + '">' + t + '</div>';
+    SUPPS.filter(function(s) { return s.time === t; }).forEach(function(s) {
+      html += '<div class="supp">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+        '<div style="font-size:14px;color:var(--cream)">' + s.n + '</div>' +
+        '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:' + s.col + ';flex-shrink:0;margin-left:8px">' + s.dose + '</div></div>' +
+        '<div style="font-size:11px;color:var(--muted2);line-height:1.5;margin-top:4px">' + s.why + '</div>' +
+        '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:rgba(201,168,76,.45);margin-top:4px;letter-spacing:1px">' + s.expert + '</div></div>';
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// &#9472;&#9472; SPECIALISTS &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+function renderSpecs() {
+  var f = document.getElementById('spec-filters');
+  if (!f) return;
+  var cats = ['All'];
+  SPECS.forEach(function(s) { if (cats.indexOf(s.c) === -1) cats.push(s.c); });
+  cats.forEach(function(cat) {
+    var btn = document.createElement('button');
+    btn.className = 'fbtn' + (cat === 'All' ? ' on' : '');
+    btn.textContent = cat;
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.fbtn').forEach(function(b) { b.classList.remove('on'); });
+      btn.classList.add('on');
+      renderSpecCards(cat);
+    });
+    f.appendChild(btn);
+  });
+  renderSpecCards('All');
+}
+
+function renderSpecCards(cat) {
+  var el = document.getElementById('specs-c');
+  if (!el) return;
+  var shown = cat === 'All' ? SPECS : SPECS.filter(function(s) { return s.c === cat; });
+  el.innerHTML = shown.map(function(s, i) {
+    var pc = PILLCOLS[i % 5];
+    return '<div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">' +
+      '<div><div style="font-size:14px;font-weight:400;color:var(--cream);margin-bottom:4px">' + s.n + '</div>' +
+      '<div style="font-size:12px;color:var(--muted2);line-height:1.5">' + s.t + '</div></div>' +
+      '<span class="pill" style="background:' + pc + '18;color:' + pc + ';border:1px solid ' + pc + '30;flex-shrink:0">' + s.c + '</span>' +
+      '</div></div>';
+  }).join('');
+}
+
+</script>
+</body>
+</html>
